@@ -3,48 +3,17 @@ package cn.puji.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import cn.puji.app.ui.PujiApp
+import cn.puji.app.ui.theme.PujiTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { PujiShell() }
-    }
-}
-
-@Composable
-fun PujiShell() {
-    MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F0E4)) {
-            Box(contentAlignment = Alignment.Center) {
-                Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text("铺记", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black)
-                    Text("小卖部进出货", color = Color(0xFF53645B))
-                }
+        val app = application as PujiApplication
+        setContent {
+            PujiTheme {
+                PujiApp(app.products, app.inventory, app.dashboard)
             }
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-private fun PujiShellPreview() = PujiShell()
-
