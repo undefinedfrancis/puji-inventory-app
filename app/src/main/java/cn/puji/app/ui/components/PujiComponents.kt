@@ -71,7 +71,17 @@ fun Metric(label: String, value: String, modifier: Modifier = Modifier, highligh
     ) {
         Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(label, color = InkMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Text(value, fontSize = 22.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+            Text(
+                value,
+                fontSize = when {
+                    value.length > 13 -> 15.sp
+                    value.length > 10 -> 18.sp
+                    else -> 22.sp
+                },
+                maxLines = 1,
+                fontWeight = FontWeight.Black,
+                fontFamily = FontFamily.Monospace,
+            )
         }
     }
 }

@@ -68,7 +68,10 @@ fun RecordsScreen(
                 Text("销售收入", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                 Text(
                     Money.format(summary.salesRevenueCents),
-                    style = MaterialTheme.typography.displaySmall,
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontSize = if (Money.format(summary.salesRevenueCents).length > 13) 27.sp else 38.sp,
+                    ),
+                    maxLines = 1,
                     fontFamily = FontFamily.Monospace,
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

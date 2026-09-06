@@ -1,6 +1,7 @@
 package cn.puji.app.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -124,6 +125,7 @@ fun HomeScreen(
                 OutlinedButton(
                     onClick = onReset,
                     modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, Color(0xFFB3261E).copy(alpha = .55f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB3261E)),
                 ) { Text("重置全部数据") }
             }

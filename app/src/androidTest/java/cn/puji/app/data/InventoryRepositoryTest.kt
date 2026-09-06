@@ -87,10 +87,15 @@ class InventoryRepositoryTest {
     }
 
     @Test fun products_canBeFilteredByNormalizedCategory() {
-        val drink = products.list().first { it.category == "饮料" }
+        val drink = products.list().first { it.name.startsWith("可口可乐") }
         products.save(drink.copy(category = " ")).getOrThrow()
 
         assertTrue(products.list(category = "饮料").all { it.category == "饮料" })
         assertEquals(listOf(drink.id), products.list(category = "未分类").map { it.id })
+        assertEquals(
+            listOf("农夫山泉 550ml"),
+            products.list(query = "农夫", category = "饮料").map { it.name },
+        )
+        assertTrue(products.list(query = "面", category = "饮料").isEmpty())
     }
 }
