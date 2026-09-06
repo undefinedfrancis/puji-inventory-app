@@ -3,6 +3,7 @@ package cn.puji.app.data
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import cn.puji.app.domain.Cart
+import cn.puji.app.domain.DateRange
 import cn.puji.app.domain.DocumentType
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -56,5 +57,32 @@ class InventoryRepositoryTest {
         val stats = DashboardRepository(database).stats()
         assertEquals(cart.totalCents, stats.todaySalesCents)
         assertEquals(cart.totalQuantity, stats.todayItemCount)
+    }
+
+    @Test fun outbound_keepsCostSnapshotAfterProductPriceChanges() {
+        val product = products.list().first()
+        inventory.commit(Cart.empty(DocumentType.OUTBOUND).add(product)).getOrThrow()
+
+        products.save(product.copy(costPriceCents = product.costPriceCents + 100)).getOrThrow()
+
+        assertEquals(
+            product.costPriceCents,
+            inventory.documents().single().lines.single().costPriceSnapshotCents,
+        )
+    }
+
+    @Test fun documents_rangeIncludesStartAndExcludesEnd() {
+        var now = 1_000L
+        val timedInventory = InventoryRepository(database) { now }
+        val product = products.list().first()
+        timedInventory.commit(Cart.empty(DocumentType.OUTBOUND).add(product)).getOrThrow()
+        now = 1_500L
+        timedInventory.commit(Cart.empty(DocumentType.OUTBOUND).add(product)).getOrThrow()
+        now = 2_000L
+        timedInventory.commit(Cart.empty(DocumentType.OUTBOUND).add(product)).getOrThrow()
+
+        val results = timedInventory.documents(range = DateRange(1_000L, 2_000L, "测试范围"))
+
+        assertEquals(listOf(1_500L, 1_000L), results.map { it.createdAt })
     }
 }

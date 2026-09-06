@@ -35,9 +35,12 @@ data class DocumentLine(
     val productName: String,
     val barcode: String,
     val unitPriceCents: Long,
+    val costPriceSnapshotCents: Long = 0,
     val quantity: Int,
 ) {
     val lineTotalCents: Long get() = unitPriceCents * quantity
+    val costTotalCents: Long get() = costPriceSnapshotCents * quantity
+    val grossProfitCents: Long get() = lineTotalCents - costTotalCents
 }
 
 data class DashboardStats(
@@ -47,4 +50,3 @@ data class DashboardStats(
     val lowStockCount: Int = 0,
     val inventoryValueCents: Long = 0,
 )
-

@@ -41,6 +41,7 @@ class PujiDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 product_name_snapshot TEXT NOT NULL,
                 barcode_snapshot TEXT NOT NULL DEFAULT '',
                 unit_price_cents INTEGER NOT NULL,
+                cost_price_snapshot_cents INTEGER NOT NULL DEFAULT 0,
                 quantity INTEGER NOT NULL CHECK(quantity > 0),
                 line_total_cents INTEGER NOT NULL
             )""".trimIndent(),
@@ -57,11 +58,30 @@ class PujiDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             )""".trimIndent(),
         )
         db.execSQL("CREATE INDEX idx_documents_created ON documents(created_at DESC)")
+        db.execSQL("CREATE INDEX idx_documents_type_created ON documents(type, created_at DESC)")
         db.execSQL("CREATE INDEX idx_lines_document ON document_lines(document_id)")
         seedProducts(db)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) {
+            db.execSQL(
+                "ALTER TABLE document_lines ADD COLUMN cost_price_snapshot_cents INTEGER NOT NULL DEFAULT 0",
+            )
+            db.execSQL(
+                """UPDATE document_lines
+                   SET cost_price_snapshot_cents = CASE
+                       WHEN (SELECT d.type FROM documents d WHERE d.id = document_lines.document_id) = 'INBOUND'
+                           THEN unit_price_cents
+                       ELSE COALESCE(
+                           (SELECT p.cost_price_cents FROM products p WHERE p.id = document_lines.product_id),
+                           0
+                       )
+                   END""".trimIndent(),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_documents_type_created ON documents(type, created_at DESC)")
+        }
+    }
 
     private fun seedProducts(db: SQLiteDatabase) {
         val now = System.currentTimeMillis()
@@ -81,6 +101,6 @@ class PujiDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
 
     companion object {
         private const val DATABASE_NAME = "puji.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
     }
 }
