@@ -31,5 +31,11 @@ class CartTest {
         val cart = Cart.empty(DocumentType.OUTBOUND).add(cola).decrement(cola.id)
         assertTrue(cart.lines.isEmpty())
     }
-}
 
+    @Test fun addWithQuantity_usesTheExactQuantityWithoutAnImplicitExtraItem() {
+        val cart = Cart.empty(DocumentType.INBOUND).add(cola, quantity = 5)
+
+        assertEquals(5, cart.totalQuantity)
+        assertEquals(cola.costPriceCents * 5, cart.totalCents)
+    }
+}

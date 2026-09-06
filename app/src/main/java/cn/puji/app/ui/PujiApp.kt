@@ -46,6 +46,7 @@ import cn.puji.app.domain.ProductCategories
 import cn.puji.app.domain.ProductCategoryCount
 import cn.puji.app.export.CsvExporter
 import cn.puji.app.scanner.ScanTransactionGate
+import cn.puji.app.scanner.ScannedProductRegistration
 import cn.puji.app.ui.home.HomeScreen
 import cn.puji.app.ui.home.ResetDataDialog
 import cn.puji.app.ui.inventory.InventoryScreen
@@ -347,20 +348,44 @@ fun PujiApp(
         ProductEditor(
             product = editing,
             seedBarcode = seedBarcode,
+            registrationMode = mode.takeIf { addAfterSave },
             onDismiss = {
                 showEditor = false
                 if (addAfterSave) unlockScannerAfterCancellation()
                 addAfterSave = false
             },
             onSave = { product ->
-                productRepository.save(product).fold(
+                val registrationPlan = if (addAfterSave) ScannedProductRegistration.plan(product, mode) else null
+                productRepository.save(registrationPlan?.productToSave ?: product).fold(
                     onSuccess = { id ->
                         val saved = productRepository.find(id)
-                        if (addAfterSave && saved != null) cart = cart.add(saved)
-                        showEditor = false
-                        addAfterSave = false
-                        message = "商品已保存"
-                        reload()
+                        if (registrationPlan?.completeTransactionOnSave == true && saved != null) {
+                            val inboundCart = ScannedProductRegistration.transactionCart(saved, registrationPlan)
+                            inventoryRepository.commit(inboundCart).fold(
+                                onSuccess = {
+                                    cart = Cart.empty(mode)
+                                    showEditor = false
+                                    addAfterSave = false
+                                    scanGate.transactionSucceeded()
+                                    scannerLocked = false
+                                    message = "商品已建立，入货 ${registrationPlan.transactionQuantity} 件"
+                                    reload()
+                                },
+                                onFailure = {
+                                    cart = inboundCart
+                                    showEditor = false
+                                    addAfterSave = false
+                                    message = "商品已保存，入货未完成，请重试"
+                                    reload()
+                                },
+                            )
+                        } else {
+                            if (addAfterSave && saved != null) cart = cart.add(saved)
+                            showEditor = false
+                            addAfterSave = false
+                            message = "商品已保存"
+                            reload()
+                        }
                     },
                     onFailure = { message = it.message ?: "保存失败" },
                 )

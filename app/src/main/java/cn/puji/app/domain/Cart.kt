@@ -16,13 +16,14 @@ data class Cart(
     val totalCents: Long get() = lines.sumOf(CartLine::totalCents)
     val totalQuantity: Int get() = lines.sumOf(CartLine::quantity)
 
-    fun add(product: Product): Cart {
+    fun add(product: Product, quantity: Int = 1): Cart {
+        require(quantity > 0) { "数量必须大于 0" }
         val existing = lines.firstOrNull { it.product.id == product.id }
         val defaultPrice = if (type == DocumentType.INBOUND) product.costPriceCents else product.salePriceCents
         return if (existing == null) {
-            copy(lines = lines + CartLine(product, 1, defaultPrice))
+            copy(lines = lines + CartLine(product, quantity, defaultPrice))
         } else {
-            copy(lines = lines.map { if (it.product.id == product.id) it.copy(quantity = it.quantity + 1) else it })
+            copy(lines = lines.map { if (it.product.id == product.id) it.copy(quantity = it.quantity + quantity) else it })
         }
     }
 
@@ -51,4 +52,3 @@ data class Cart(
         fun empty(type: DocumentType) = Cart(type)
     }
 }
-

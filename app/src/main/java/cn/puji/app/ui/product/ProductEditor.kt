@@ -25,17 +25,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cn.puji.app.domain.Money
+import cn.puji.app.domain.DocumentType
 import cn.puji.app.domain.Product
 
 @Composable
 fun ProductEditor(
     product: Product?,
     seedBarcode: String = "",
+    registrationMode: DocumentType? = null,
     onDismiss: () -> Unit,
     onSave: (Product) -> Unit,
     onDeactivate: ((Product) -> Unit)? = null,
 ) {
-    var form by remember(product, seedBarcode) {
+    var form by remember(product, seedBarcode, registrationMode) {
         mutableStateOf(
             ProductForm(
                 name = product?.name.orEmpty(),
@@ -43,7 +45,8 @@ fun ProductEditor(
                 category = product?.category.orEmpty(),
                 costPrice = product?.let { "%.2f".format(it.costPriceCents / 100.0) } ?: "0.00",
                 salePrice = product?.let { "%.2f".format(it.salePriceCents / 100.0) } ?: "0.00",
-                stock = product?.stockQuantity?.toString() ?: "0",
+                stock = product?.stockQuantity?.toString()
+                    ?: if (registrationMode == DocumentType.INBOUND) "1" else "0",
                 threshold = product?.lowStockThreshold?.toString() ?: "5",
                 note = product?.note.orEmpty(),
             ),
@@ -58,7 +61,12 @@ fun ProductEditor(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(if (product == null) "新商品入册" else "编辑商品", style = MaterialTheme.typography.headlineMedium)
-                Text("条码、价格和库存都可以稍后修改", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    if (product == null && registrationMode == DocumentType.INBOUND) {
+                        "完善商品资料后，本次入货会直接记入流水"
+                    } else "条码、价格和库存都可以稍后修改",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 Field("商品名称", form.name, { form = form.copy(name = it) }, error = errors[ProductField.NAME])
                 Field("条码（可留空）", form.barcode, { form = form.copy(barcode = it) })
                 Field("分类", form.category, { form = form.copy(category = it) })
@@ -67,7 +75,14 @@ fun ProductEditor(
                     Field("售价", form.salePrice, { form = form.copy(salePrice = it) }, Modifier.weight(1f), errors[ProductField.SALE_PRICE], true)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Field("现有库存", form.stock, { form = form.copy(stock = it) }, Modifier.weight(1f), errors[ProductField.STOCK], true)
+                    Field(
+                        if (product == null && registrationMode == DocumentType.INBOUND) "本次入货数量" else "现有库存",
+                        form.stock,
+                        { form = form.copy(stock = it) },
+                        Modifier.weight(1f),
+                        errors[ProductField.STOCK],
+                        true,
+                    )
                     Field("低库存预警", form.threshold, { form = form.copy(threshold = it) }, Modifier.weight(1f), errors[ProductField.THRESHOLD], true)
                 }
                 Field("备注", form.note, { form = form.copy(note = it) })
@@ -75,7 +90,10 @@ fun ProductEditor(
                     OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f)) { Text("取消") }
                     Button(
                         onClick = {
-                            val checked = ProductFormValidator.validate(form)
+                            val checked = ProductFormValidator.validate(
+                                form,
+                                minimumStock = if (product == null && registrationMode == DocumentType.INBOUND) 1 else 0,
+                            )
                             errors = checked
                             if (checked.isEmpty()) {
                                 onSave(
@@ -93,7 +111,11 @@ fun ProductEditor(
                             }
                         },
                         modifier = Modifier.weight(1f),
-                    ) { Text("保存商品") }
+                    ) {
+                        Text(
+                            if (product == null && registrationMode == DocumentType.INBOUND) "确认入货" else "保存商品",
+                        )
+                    }
                 }
                 if (product != null && onDeactivate != null) {
                     OutlinedButton(onClick = { onDeactivate(product) }, modifier = Modifier.fillMaxWidth()) { Text("停用此商品") }

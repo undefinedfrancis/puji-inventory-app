@@ -15,5 +15,12 @@ class ProductFormValidatorTest {
         assertTrue(ProductField.STOCK in errors)
         assertTrue(ProductField.THRESHOLD in errors)
     }
-}
 
+    @Test fun scannedInbound_requiresAtLeastOneItem() {
+        val form = ProductForm(name = "牛奶", costPrice = "2.00", salePrice = "3.00", stock = "0")
+
+        val errors = ProductFormValidator.validate(form, minimumStock = 1)
+
+        assertEquals("本次入货数量至少为 1", errors[ProductField.STOCK])
+    }
+}

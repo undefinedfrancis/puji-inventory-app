@@ -5,6 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import cn.puji.app.domain.Cart
 import cn.puji.app.domain.DateRange
 import cn.puji.app.domain.DocumentType
+import cn.puji.app.domain.Product
+import cn.puji.app.scanner.ScannedProductRegistration
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -97,5 +99,23 @@ class InventoryRepositoryTest {
             products.list(query = "农夫", category = "饮料").map { it.name },
         )
         assertTrue(products.list(query = "面", category = "饮料").isEmpty())
+    }
+
+    @Test fun scannedInboundRegistration_doesNotAddAnExtraItem() {
+        val entered = Product(
+            name = "新商品",
+            barcode = "88990011",
+            costPriceCents = 200,
+            salePriceCents = 300,
+            stockQuantity = 5,
+        )
+        val plan = ScannedProductRegistration.plan(entered, DocumentType.INBOUND)
+        val id = products.save(plan.productToSave).getOrThrow()
+        val saved = products.find(id)!!
+
+        inventory.commit(ScannedProductRegistration.transactionCart(saved, plan)).getOrThrow()
+
+        assertEquals(5, products.find(id)!!.stockQuantity)
+        assertEquals(5, inventory.documents().single().lines.single().quantity)
     }
 }
