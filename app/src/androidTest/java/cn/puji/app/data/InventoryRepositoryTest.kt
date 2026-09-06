@@ -85,4 +85,12 @@ class InventoryRepositoryTest {
 
         assertEquals(listOf(1_500L, 1_000L), results.map { it.createdAt })
     }
+
+    @Test fun products_canBeFilteredByNormalizedCategory() {
+        val drink = products.list().first { it.category == "饮料" }
+        products.save(drink.copy(category = " ")).getOrThrow()
+
+        assertTrue(products.list(category = "饮料").all { it.category == "饮料" })
+        assertEquals(listOf(drink.id), products.list(category = "未分类").map { it.id })
+    }
 }

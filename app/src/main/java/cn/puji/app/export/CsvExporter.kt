@@ -28,7 +28,7 @@ object CsvExporter {
 
     fun documents(documents: List<StockDocument>): String = buildString {
         append('\uFEFF')
-        append("单号,类型,时间,商品,条码,单价,数量,小计,单据总额,备注\r\n")
+        append("单号,类型,时间,商品,条码,单价,数量,小计,成本金额,毛利润,单据总额,备注\r\n")
         documents.forEach { document ->
             document.lines.forEach { line ->
                 appendRow(
@@ -40,6 +40,10 @@ object CsvExporter {
                     "%.2f".format(Locale.US, line.unitPriceCents / 100.0),
                     line.quantity.toString(),
                     "%.2f".format(Locale.US, line.lineTotalCents / 100.0),
+                    "%.2f".format(Locale.US, line.costTotalCents / 100.0),
+                    if (document.type == DocumentType.OUTBOUND) {
+                        "%.2f".format(Locale.US, line.grossProfitCents / 100.0)
+                    } else "",
                     "%.2f".format(Locale.US, document.totalCents / 100.0),
                     document.note,
                 )

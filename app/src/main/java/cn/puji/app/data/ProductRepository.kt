@@ -8,13 +8,24 @@ import cn.puji.app.domain.Product
 class DuplicateBarcodeException : IllegalArgumentException("这个条码已经属于其他商品")
 
 class ProductRepository(private val database: PujiDatabase) {
-    fun list(query: String = "", includeInactive: Boolean = false): List<Product> {
+    fun list(
+        query: String = "",
+        category: String? = null,
+        includeInactive: Boolean = false,
+    ): List<Product> {
         val normalized = query.trim()
         val where = buildList {
             if (!includeInactive) add("active = 1")
             if (normalized.isNotEmpty()) add("(name LIKE ? OR barcode LIKE ? OR category LIKE ?)")
+            if (category != null && category != "全部") {
+                add("COALESCE(NULLIF(TRIM(category), ''), '未分类') = ?")
+            }
         }.joinToString(" AND ").ifEmpty { null }
-        val args = if (normalized.isNotEmpty()) Array(3) { "%$normalized%" } else null
+        val argumentList = buildList {
+            if (normalized.isNotEmpty()) repeat(3) { add("%$normalized%") }
+            if (category != null && category != "全部") add(category.trim().ifBlank { "未分类" })
+        }
+        val args = argumentList.toTypedArray().takeIf { it.isNotEmpty() }
         return database.readableDatabase.query(
             "products", null, where, args, null, null,
             "CASE WHEN stock_quantity <= low_stock_threshold THEN 0 ELSE 1 END, updated_at DESC",
@@ -83,4 +94,3 @@ internal fun Cursor.toProduct() = Product(
     createdAt = getLong(getColumnIndexOrThrow("created_at")),
     updatedAt = getLong(getColumnIndexOrThrow("updated_at")),
 )
-
