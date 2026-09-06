@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         val app = application as PujiApplication
         setContent {
             PujiTheme {
-                PujiApp(app.products, app.inventory, app.dashboard)
+                PujiApp(app.products, app.inventory, app.dashboard, app.businessSummary, app.appReset)
             }
         }
     }

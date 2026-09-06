@@ -28,6 +28,7 @@ import cn.puji.app.ui.components.PageHeader
 import cn.puji.app.ui.components.ReceiptCard
 import cn.puji.app.ui.components.StatusPill
 import cn.puji.app.ui.theme.ScannerOrange
+import androidx.compose.ui.graphics.Color
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,6 +41,7 @@ fun HomeScreen(
     onOutbound: () -> Unit,
     onInventory: () -> Unit,
     onAbout: () -> Unit,
+    onReset: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -108,6 +110,22 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+        item {
+            Spacer(Modifier.height(14.dp))
+            ReceiptCard(accent = MaterialTheme.colorScheme.surfaceVariant) {
+                Text("数据管理", fontWeight = FontWeight.Black)
+                Text(
+                    "仅在需要从空白账本重新开始时使用。",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                )
+                OutlinedButton(
+                    onClick = onReset,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB3261E)),
+                ) { Text("重置全部数据") }
             }
         }
         item { Spacer(Modifier.height(84.dp)) }

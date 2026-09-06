@@ -2,10 +2,9 @@ package cn.puji.app.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -32,27 +31,41 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import cn.puji.app.BuildConfig
+import cn.puji.app.data.AppResetRepository
+import cn.puji.app.data.BusinessSummaryRepository
 import cn.puji.app.data.DashboardRepository
 import cn.puji.app.data.InventoryRepository
 import cn.puji.app.data.ProductRepository
+import cn.puji.app.domain.BusinessSummary
 import cn.puji.app.domain.Cart
+import cn.puji.app.domain.DateRange
 import cn.puji.app.domain.DocumentType
+import cn.puji.app.domain.PeriodCalculator
+import cn.puji.app.domain.PeriodKind
 import cn.puji.app.domain.Product
+import cn.puji.app.domain.ProductCategories
+import cn.puji.app.domain.ProductCategoryCount
 import cn.puji.app.export.CsvExporter
 import cn.puji.app.scanner.ScanTransactionGate
 import cn.puji.app.ui.home.HomeScreen
+import cn.puji.app.ui.home.ResetDataDialog
 import cn.puji.app.ui.inventory.InventoryScreen
 import cn.puji.app.ui.product.ProductEditor
+import cn.puji.app.ui.records.CustomExportDialog
+import cn.puji.app.ui.records.LedgerScreen
 import cn.puji.app.ui.records.RecordsScreen
 import cn.puji.app.ui.scanner.ScannerScreen
-import cn.puji.app.ui.theme.Paper
 import cn.puji.app.ui.theme.ScannerOrange
 import cn.puji.app.ui.theme.TicketGreenSoft
 import cn.puji.app.ui.theme.WarningSoft
 import java.io.File
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 private enum class AppTab(val label: String, val symbol: String) {
-    HOME("首页", "⌂"), INVENTORY("库存", "▦"), SCANNER("扫码", "▣"), RECORDS("记录", "≋")
+    HOME("首页", "⌂"), INVENTORY("货架", "▦"), SCANNER("扫码", "▣"), RECORDS("记录", "≡")
 }
 
 @Composable
@@ -60,14 +73,30 @@ fun PujiApp(
     productRepository: ProductRepository,
     inventoryRepository: InventoryRepository,
     dashboardRepository: DashboardRepository,
+    businessSummaryRepository: BusinessSummaryRepository,
+    appResetRepository: AppResetRepository,
 ) {
     val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    val today = remember { LocalDate.now() }
     var selectedTab by remember { mutableStateOf(AppTab.HOME) }
     var query by remember { mutableStateOf("") }
-    var products by remember { mutableStateOf(productRepository.list()) }
-    var documents by remember { mutableStateOf(inventoryRepository.documents()) }
-    var recordFilter by remember { mutableStateOf<DocumentType?>(null) }
+    var selectedCategory by remember { mutableStateOf("全部") }
+    var allProducts by remember { mutableStateOf(productRepository.list()) }
+    var products by remember { mutableStateOf(allProducts) }
+    var categoryCounts by remember { mutableStateOf(ProductCategories.counts(allProducts)) }
     var stats by remember { mutableStateOf(dashboardRepository.stats()) }
+
+    var periodKind by remember { mutableStateOf(PeriodKind.MONTH) }
+    var periodAnchor by remember { mutableStateOf(today) }
+    var summaryRange by remember { mutableStateOf(PeriodCalculator.range(periodKind, periodAnchor, zone)) }
+    var summary by remember { mutableStateOf(businessSummaryRepository.summary(summaryRange, periodKind, zone)) }
+    var ledgerAnchor by remember { mutableStateOf(today) }
+    var ledgerRange by remember { mutableStateOf(PeriodCalculator.range(PeriodKind.MONTH, ledgerAnchor, zone)) }
+    var recordFilter by remember { mutableStateOf<DocumentType?>(null) }
+    var documents by remember { mutableStateOf(inventoryRepository.documents(recordFilter, ledgerRange)) }
+    var showingLedger by remember { mutableStateOf(false) }
+
     var mode by remember { mutableStateOf(DocumentType.OUTBOUND) }
     var cart by remember { mutableStateOf(Cart.empty(mode)) }
     var manualBarcode by remember { mutableStateOf("") }
@@ -76,20 +105,51 @@ fun PujiApp(
     var seedBarcode by remember { mutableStateOf("") }
     var addAfterSave by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
+    var showReset by remember { mutableStateOf(false) }
+    var resetWorking by remember { mutableStateOf(false) }
+    var showCustomExport by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     val scanGate = remember { ScanTransactionGate() }
     var scannerLocked by remember { mutableStateOf(false) }
     val snackbarHost = remember { SnackbarHostState() }
 
-    fun unlockScannerAfterCancellation() {
-        scanGate.registrationCancelled()
-        scannerLocked = false
+    fun refreshProducts() {
+        val fresh = productRepository.list()
+        val counts = ProductCategories.counts(fresh)
+        val selected = selectedCategory.takeIf { choice -> counts.any { it.name == choice } } ?: "全部"
+        allProducts = fresh
+        categoryCounts = counts
+        selectedCategory = selected
+        products = productRepository.list(query = query, category = selected)
+    }
+
+    fun refreshReporting() {
+        summary = businessSummaryRepository.summary(summaryRange, periodKind, zone)
+        documents = inventoryRepository.documents(recordFilter, ledgerRange)
     }
 
     fun reload() {
-        products = productRepository.list(query)
-        documents = inventoryRepository.documents(recordFilter)
+        refreshProducts()
+        refreshReporting()
         stats = dashboardRepository.stats()
+    }
+
+    fun updateSummaryPeriod(kind: PeriodKind, anchor: LocalDate) {
+        periodKind = kind
+        periodAnchor = anchor
+        summaryRange = PeriodCalculator.range(kind, anchor, zone)
+        summary = businessSummaryRepository.summary(summaryRange, kind, zone)
+    }
+
+    fun updateLedgerMonth(anchor: LocalDate) {
+        ledgerAnchor = anchor
+        ledgerRange = PeriodCalculator.range(PeriodKind.MONTH, anchor, zone)
+        documents = inventoryRepository.documents(recordFilter, ledgerRange)
+    }
+
+    fun unlockScannerAfterCancellation() {
+        scanGate.registrationCancelled()
+        scannerLocked = false
     }
 
     fun openScanner(target: DocumentType) {
@@ -119,9 +179,31 @@ fun PujiApp(
         }
     }
 
+    fun exportDocuments(range: DateRange, type: DocumentType?) {
+        val exportDocuments = inventoryRepository.documents(type, range)
+        if (exportDocuments.isEmpty()) {
+            message = "所选时间没有流水"
+            return
+        }
+        val start = range.startInclusive.toLocalDate(zone)
+        val end = range.endExclusive.toLocalDate(zone).minusDays(1)
+        val typeLabel = when (type) {
+            DocumentType.OUTBOUND -> "出货"
+            DocumentType.INBOUND -> "入货"
+            null -> "全部"
+        }
+        val fileName = "铺记-流水-${start.format(DateTimeFormatter.ISO_LOCAL_DATE)}至${end.format(DateTimeFormatter.ISO_LOCAL_DATE)}-$typeLabel.csv"
+        shareCsv(context, fileName, "导出流水 CSV", CsvExporter.documents(exportDocuments)).fold(
+            onSuccess = { message = "流水 CSV 已打开分享面板" },
+            onFailure = { message = "无法打开分享面板，请检查可用应用" },
+        )
+    }
+
     LaunchedEffect(message) {
         message?.let { snackbarHost.showSnackbar(it); message = null }
     }
+
+    BackHandler(enabled = selectedTab == AppTab.RECORDS && showingLedger) { showingLedger = false }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -132,7 +214,13 @@ fun PujiApp(
                 AppTab.entries.forEach { tab ->
                     NavigationBarItem(
                         selected = selectedTab == tab,
-                        onClick = { selectedTab = tab; if (tab == AppTab.RECORDS) reload() },
+                        onClick = {
+                            selectedTab = tab
+                            if (tab == AppTab.RECORDS) {
+                                showingLedger = false
+                                reload()
+                            }
+                        },
                         icon = {
                             Text(
                                 tab.symbol,
@@ -155,21 +243,38 @@ fun PujiApp(
             when (selectedTab) {
                 AppTab.HOME -> HomeScreen(
                     stats = stats,
-                    lowStock = products.filter(Product::isLowStock),
+                    lowStock = allProducts.filter(Product::isLowStock),
                     onInbound = { openScanner(DocumentType.INBOUND) },
                     onOutbound = { openScanner(DocumentType.OUTBOUND) },
                     onInventory = { selectedTab = AppTab.INVENTORY },
                     onAbout = { showAbout = true },
+                    onReset = { showReset = true },
                 )
                 AppTab.INVENTORY -> InventoryScreen(
                     products = products,
                     query = query,
-                    onQueryChange = { query = it; products = productRepository.list(it) },
+                    categories = categoryCounts,
+                    selectedCategory = selectedCategory,
+                    onQueryChange = {
+                        query = it
+                        products = productRepository.list(query = it, category = selectedCategory)
+                    },
+                    onCategoryChange = {
+                        selectedCategory = it
+                        products = productRepository.list(query = query, category = it)
+                    },
                     onAdd = { editing = null; seedBarcode = ""; addAfterSave = false; showEditor = true },
                     onEdit = { editing = it; seedBarcode = ""; addAfterSave = false; showEditor = true },
                     onExport = {
-                        shareCsv(context, "铺记-库存.csv", "导出库存 CSV", CsvExporter.products(productRepository.list(includeInactive = true)))
-                        message = "库存 CSV 已打开分享面板"
+                        shareCsv(
+                            context,
+                            "铺记-库存.csv",
+                            "导出库存 CSV",
+                            CsvExporter.products(productRepository.list(includeInactive = true)),
+                        ).fold(
+                            onSuccess = { message = "库存 CSV 已打开分享面板" },
+                            onFailure = { message = "无法打开分享面板，请检查可用应用" },
+                        )
                     },
                 )
                 AppTab.SCANNER -> ScannerScreen(
@@ -204,15 +309,37 @@ fun PujiApp(
                         )
                     },
                 )
-                AppTab.RECORDS -> RecordsScreen(
-                    documents = documents,
-                    filter = recordFilter,
-                    onFilterChange = { recordFilter = it; documents = inventoryRepository.documents(it) },
-                    onExport = {
-                        shareCsv(context, "铺记-流水.csv", "导出流水 CSV", CsvExporter.documents(inventoryRepository.documents()))
-                        message = "流水 CSV 已打开分享面板"
-                    },
-                )
+                AppTab.RECORDS -> if (showingLedger) {
+                    LedgerScreen(
+                        documents = documents,
+                        range = ledgerRange,
+                        filter = recordFilter,
+                        canGoNext = !PeriodCalculator.isCurrent(PeriodKind.MONTH, ledgerAnchor),
+                        onBack = { showingLedger = false },
+                        onPrevious = { updateLedgerMonth(PeriodCalculator.previous(PeriodKind.MONTH, ledgerAnchor)) },
+                        onNext = { updateLedgerMonth(PeriodCalculator.next(PeriodKind.MONTH, ledgerAnchor)) },
+                        onFilterChange = {
+                            recordFilter = it
+                            documents = inventoryRepository.documents(it, ledgerRange)
+                        },
+                        onExportMonth = { exportDocuments(ledgerRange, recordFilter) },
+                        onCustomExport = { showCustomExport = true },
+                    )
+                } else {
+                    RecordsScreen(
+                        summary = summary,
+                        periodKind = periodKind,
+                        range = summaryRange,
+                        canGoNext = !PeriodCalculator.isCurrent(periodKind, periodAnchor),
+                        onPeriodKindChange = { updateSummaryPeriod(it, LocalDate.now()) },
+                        onPrevious = { updateSummaryPeriod(periodKind, PeriodCalculator.previous(periodKind, periodAnchor)) },
+                        onNext = { updateSummaryPeriod(periodKind, PeriodCalculator.next(periodKind, periodAnchor)) },
+                        onOpenLedger = {
+                            showingLedger = true
+                            documents = inventoryRepository.documents(recordFilter, ledgerRange)
+                        },
+                    )
+                }
             }
         }
     }
@@ -250,6 +377,59 @@ fun PujiApp(
         )
     }
 
+    if (showReset) {
+        ResetDataDialog(
+            working = resetWorking,
+            onDismiss = { showReset = false },
+            onConfirm = {
+                resetWorking = true
+                appResetRepository.clearAll().fold(
+                    onSuccess = {
+                        query = ""
+                        selectedCategory = "全部"
+                        allProducts = emptyList()
+                        products = emptyList()
+                        categoryCounts = listOf(ProductCategoryCount("全部", 0))
+                        stats = dashboardRepository.stats()
+                        cart = Cart.empty(mode)
+                        scanGate.transactionSucceeded()
+                        scannerLocked = false
+                        recordFilter = null
+                        showingLedger = false
+                        updateSummaryPeriod(PeriodKind.MONTH, LocalDate.now())
+                        updateLedgerMonth(LocalDate.now())
+                        selectedTab = AppTab.HOME
+                        resetWorking = false
+                        showReset = false
+                        message = "数据已重置"
+                    },
+                    onFailure = {
+                        resetWorking = false
+                        message = "重置失败，原数据已保留"
+                    },
+                )
+            },
+        )
+    }
+
+    if (showCustomExport) {
+        CustomExportDialog(
+            initialStart = ledgerRange.startInclusive.toLocalDate(zone),
+            initialEnd = ledgerRange.endExclusive.toLocalDate(zone).minusDays(1),
+            initialType = recordFilter,
+            onDismiss = { showCustomExport = false },
+            onExport = { start, end, type ->
+                PeriodCalculator.custom(start, end, zone).fold(
+                    onSuccess = {
+                        showCustomExport = false
+                        exportDocuments(it, type)
+                    },
+                    onFailure = { message = it.message ?: "日期范围无效" },
+                )
+            },
+        )
+    }
+
     if (showAbout) AboutDialog(onDismiss = { showAbout = false }, onOpenSource = {
         context.startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/opensourcepos/opensourcepos".toUri()))
     })
@@ -271,7 +451,7 @@ private fun AboutDialog(onDismiss: () -> Unit, onOpenSource: () -> Unit) {
     )
 }
 
-private fun shareCsv(context: Context, fileName: String, chooserTitle: String, csv: String) {
+private fun shareCsv(context: Context, fileName: String, chooserTitle: String, csv: String): Result<Unit> = runCatching {
     val directory = File(context.cacheDir, "exports").apply { mkdirs() }
     val file = File(directory, fileName).apply { writeText(csv, Charsets.UTF_8) }
     val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
@@ -282,3 +462,5 @@ private fun shareCsv(context: Context, fileName: String, chooserTitle: String, c
     }
     context.startActivity(Intent.createChooser(intent, chooserTitle))
 }
+
+private fun Long.toLocalDate(zone: ZoneId): LocalDate = Instant.ofEpochMilli(this).atZone(zone).toLocalDate()
