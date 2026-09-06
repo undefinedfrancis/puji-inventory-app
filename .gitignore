@@ -7,5 +7,6 @@ local.properties
 keystore.properties
 .DS_Store
 .superpowers/
+.worktrees/
 dist/*.apk
 dist/**/*.apk
