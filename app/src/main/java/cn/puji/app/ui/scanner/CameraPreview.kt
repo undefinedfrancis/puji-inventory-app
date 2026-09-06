@@ -38,7 +38,7 @@ import cn.puji.app.ui.theme.ScannerOrange
 import java.util.concurrent.Executors
 
 @Composable
-fun CameraScanner(onBarcode: (String) -> Unit, modifier: Modifier = Modifier) {
+fun CameraScanner(onBarcode: (String) -> Unit, enabled: Boolean, modifier: Modifier = Modifier) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var granted by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
@@ -47,9 +47,9 @@ fun CameraScanner(onBarcode: (String) -> Unit, modifier: Modifier = Modifier) {
     LaunchedEffect(Unit) { if (!granted) launcher.launch(Manifest.permission.CAMERA) }
 
     Box(modifier = modifier.background(Color.Black, RoundedCornerShape(22.dp))) {
-        if (granted) CameraContent(onBarcode)
+        if (granted && enabled) CameraContent(onBarcode)
         else Text(
-            "相机权限未开启\n仍可在下方手动输入条码",
+            if (!enabled) "已识别商品\n确认本次交易后继续扫描" else "相机权限未开启\n仍可在下方手动输入条码",
             modifier = Modifier.align(Alignment.Center).padding(24.dp),
             color = Color.White,
         )
@@ -58,7 +58,7 @@ fun CameraScanner(onBarcode: (String) -> Unit, modifier: Modifier = Modifier) {
                 .border(2.dp, ScannerOrange, RoundedCornerShape(18.dp)),
         )
         Text(
-            "将条码放入框内",
+            if (enabled) "将条码放入框内" else "扫描已暂停",
             modifier = Modifier.align(Alignment.BottomCenter).padding(14.dp),
             color = Color.White,
             style = MaterialTheme.typography.labelLarge,
@@ -98,4 +98,3 @@ private fun CameraContent(onBarcode: (String) -> Unit) {
     }
     AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
 }
-

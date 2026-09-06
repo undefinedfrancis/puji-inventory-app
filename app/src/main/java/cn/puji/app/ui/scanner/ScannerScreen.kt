@@ -38,6 +38,7 @@ import cn.puji.app.ui.theme.ScannerOrange
 @Composable
 fun ScannerScreen(
     mode: DocumentType,
+    scannerLocked: Boolean,
     onModeChange: (DocumentType) -> Unit,
     cart: Cart,
     manualBarcode: String,
@@ -57,17 +58,23 @@ fun ScannerScreen(
             ModeButton("入货", mode == DocumentType.INBOUND, Modifier.weight(1f)) { onModeChange(DocumentType.INBOUND) }
         }
         Spacer(Modifier.height(12.dp))
-        CameraScanner(onBarcode = onLookup, modifier = Modifier.fillMaxWidth().height(190.dp))
+        CameraScanner(
+            onBarcode = onLookup,
+            enabled = !scannerLocked,
+            modifier = Modifier.fillMaxWidth().height(190.dp),
+        )
         Spacer(Modifier.height(10.dp))
         OutlinedTextField(
             value = manualBarcode,
             onValueChange = onManualBarcodeChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("手动输入条码") },
+            enabled = !scannerLocked,
             singleLine = true,
             trailingIcon = { Text("↵", fontSize = 22.sp) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { onLookup(manualBarcode) }),
+            supportingText = if (scannerLocked) {{ Text("当前商品处理中，确认本次交易后可继续扫描") }} else null,
         )
         Spacer(Modifier.height(10.dp))
         if (cart.lines.isEmpty()) {

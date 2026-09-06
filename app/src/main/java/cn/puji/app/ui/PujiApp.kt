@@ -39,6 +39,7 @@ import cn.puji.app.domain.Cart
 import cn.puji.app.domain.DocumentType
 import cn.puji.app.domain.Product
 import cn.puji.app.export.CsvExporter
+import cn.puji.app.scanner.ScanTransactionGate
 import cn.puji.app.ui.home.HomeScreen
 import cn.puji.app.ui.inventory.InventoryScreen
 import cn.puji.app.ui.product.ProductEditor
@@ -76,7 +77,14 @@ fun PujiApp(
     var addAfterSave by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
+    val scanGate = remember { ScanTransactionGate() }
+    var scannerLocked by remember { mutableStateOf(false) }
     val snackbarHost = remember { SnackbarHostState() }
+
+    fun unlockScannerAfterCancellation() {
+        scanGate.registrationCancelled()
+        scannerLocked = false
+    }
 
     fun reload() {
         products = productRepository.list(query)
@@ -85,14 +93,19 @@ fun PujiApp(
     }
 
     fun openScanner(target: DocumentType) {
+        if (!scanGate.canStartNewTransaction()) {
+            selectedTab = AppTab.SCANNER
+            message = "请先确认或取消当前商品，再开始下一笔交易"
+            return
+        }
         mode = target
         cart = Cart.empty(target)
         selectedTab = AppTab.SCANNER
     }
 
     fun lookupBarcode(raw: String) {
-        val barcode = raw.trim()
-        if (barcode.isEmpty()) return
+        val barcode = scanGate.accept(raw) ?: return
+        scannerLocked = true
         manualBarcode = ""
         val found = productRepository.findByBarcode(barcode)
         if (found == null) {
@@ -161,19 +174,30 @@ fun PujiApp(
                 )
                 AppTab.SCANNER -> ScannerScreen(
                     mode = mode,
-                    onModeChange = { if (it != mode) { mode = it; cart = Cart.empty(it) } },
+                    scannerLocked = scannerLocked,
+                    onModeChange = {
+                        if (!scannerLocked && it != mode) {
+                            mode = it
+                            cart = Cart.empty(it)
+                        }
+                    },
                     cart = cart,
                     manualBarcode = manualBarcode,
                     onManualBarcodeChange = { manualBarcode = it },
                     onLookup = ::lookupBarcode,
                     onIncrement = { id -> cart = cart.increment(id) },
-                    onDecrement = { id -> cart = cart.decrement(id) },
+                    onDecrement = { id ->
+                        cart = cart.decrement(id)
+                        if (cart.lines.isEmpty()) unlockScannerAfterCancellation()
+                    },
                     onPriceChange = { id, cents -> cart = cart.updateUnitPrice(id, cents) },
                     onConfirm = {
                         inventoryRepository.commit(cart).fold(
                             onSuccess = {
                                 message = if (mode == DocumentType.OUTBOUND) "出货完成，库存已扣减" else "入货完成，库存已增加"
                                 cart = Cart.empty(mode)
+                                scanGate.transactionSucceeded()
+                                scannerLocked = false
                                 reload()
                             },
                             onFailure = { message = it.message ?: "操作失败，请重试" },
@@ -197,7 +221,11 @@ fun PujiApp(
         ProductEditor(
             product = editing,
             seedBarcode = seedBarcode,
-            onDismiss = { showEditor = false; addAfterSave = false },
+            onDismiss = {
+                showEditor = false
+                if (addAfterSave) unlockScannerAfterCancellation()
+                addAfterSave = false
+            },
             onSave = { product ->
                 productRepository.save(product).fold(
                     onSuccess = { id ->

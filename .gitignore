@@ -8,3 +8,4 @@ keystore.properties
 .DS_Store
 .superpowers/
 dist/*.apk
+dist/**/*.apk
