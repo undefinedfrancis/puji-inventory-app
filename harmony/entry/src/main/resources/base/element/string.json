@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "铺记进销存应用"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "管理商品入货、出货、库存与经营记录"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "铺记"
+    }
+  ]
+}

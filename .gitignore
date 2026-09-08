@@ -8,5 +8,12 @@ keystore.properties
 .DS_Store
 .superpowers/
 .worktrees/
+.tools/
 dist/*.apk
 dist/**/*.apk
+harmony/.idea/
+harmony/.hvigor/
+harmony/**/build/
+harmony/local.properties
+harmony/.test/
+dist/*.hap
