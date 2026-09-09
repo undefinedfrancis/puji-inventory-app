@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@ohos/hypium';
-import { customDateRange, monthRange, quarterRange, yearRange } from '../main/ets/domain/Periods';
+import { customDateRange, monthRange, parseLocalDate, quarterRange, yearRange } from '../main/ets/domain/Periods';
 
 export default function periodsTest(): void {
   describe('Periods', () => {
@@ -41,6 +41,12 @@ export default function periodsTest(): void {
         new Date(2026, 8, 5).getTime(),
         new Date(2026, 8, 2).getTime()
       )).assertNull();
+    });
+
+    it('parsesStrictLocalDate', 0, () => {
+      expect(parseLocalDate('2026-09-08')).assertEqual(new Date(2026, 8, 8).getTime());
+      expect(parseLocalDate('2026-02-30')).assertNull();
+      expect(parseLocalDate('2026-9-8')).assertNull();
     });
   });
 }

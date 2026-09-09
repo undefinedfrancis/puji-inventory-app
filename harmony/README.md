@@ -18,14 +18,27 @@
 
 ## 命令行构建
 
-DevEco Studio 完成首次 SDK 初始化后，在本目录执行：
+由于当前仓库路径包含中文，Hvigor 命令行会拒绝直接构建。请将 `harmony/` 同步到一个仅含英文字符的临时目录后再构建，或直接在 DevEco Studio 中打开工程运行。
+
+开发机上的验证命令：
 
 ```bash
-./hvigorw assembleHap --mode module -p product=default -p module=entry@default -p buildMode=debug --no-daemon
+rsync -a --exclude build --exclude .hvigor harmony/ /private/tmp/puji-harmony-build/
+devecocli build --product default --modules entry@default --build-mode debug
 ```
 
-Debug HAP 将位于 `entry/build/default/outputs/default/` 下。最终精确路径会在首次成功构建后补充。
+Debug HAP 位于临时工程的 `entry/build/default/outputs/default/entry-default-unsigned.hap`。
+
+## 已实现功能
+
+- 首页经营概况、低库存提醒、双重确认的一键清空
+- 商品货架、类别筛选、名称/条码搜索、库存 CSV 导出
+- Scan Kit 相机条码识别和手动条码输入
+- 入货、出货购物车与库存校验
+- 未知商品扫码后暂停，保存或取消后才允许下一次扫码
+- 月度、季度、年度经营汇总
+- 按月查看流水、筛选入货/出货、月度和自定义日期 CSV 导出
 
 ## 签名说明
 
-模拟器可直接运行调试版本。安装到真实设备时，需要在 DevEco Studio 中登录华为开发者帐号并配置调试签名；发布版本还需要正式发布证书和 Profile。
+当前命令行产物为未签名 HAP。安装到真实设备或运行模拟器前，需要登录华为开发者帐号并执行自动调试签名；发布版本还需要正式发布证书和 Profile。签名材料包含帐号及设备信息，不应提交到 Git。

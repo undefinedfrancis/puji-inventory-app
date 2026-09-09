@@ -1,5 +1,21 @@
 import type { DateRange } from '../model/Models';
 
+export function parseLocalDate(raw: string): number | null {
+  const trimmed = raw.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return null;
+  }
+  const parts = trimmed.split('-');
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+  return date.getTime();
+}
+
 export function monthRange(anchorMs: number): DateRange {
   const anchor = new Date(anchorMs);
   return {

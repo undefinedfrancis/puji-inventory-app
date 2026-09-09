@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   customDateRange,
   monthRange,
+  parseLocalDate,
   quarterRange,
   yearRange
 } from '../entry/src/main/ets/domain/Periods.ets';
@@ -52,4 +53,14 @@ test('rejects a reversed custom range', () => {
     new Date(2026, 8, 5).getTime(),
     new Date(2026, 8, 2).getTime()
   ), null);
+});
+
+test('parses a strict local calendar date', () => {
+  assert.equal(parseLocalDate('2026-09-08'), new Date(2026, 8, 8).getTime());
+});
+
+test('rejects impossible or loosely formatted dates', () => {
+  assert.equal(parseLocalDate('2026-02-30'), null);
+  assert.equal(parseLocalDate('2026-9-8'), null);
+  assert.equal(parseLocalDate('not-a-date'), null);
 });

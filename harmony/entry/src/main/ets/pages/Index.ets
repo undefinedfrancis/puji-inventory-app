@@ -1,38 +1,84 @@
-/*
- * Copyright (c) 2026 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import { common } from '@kit.AbilityKit';
+import { HomePage } from './HomePage';
+import { InventoryPage } from './InventoryPage';
+import { RecordsPage } from './RecordsPage';
+import { ScannerPage } from './ScannerPage';
+import { DocumentType } from '../model/Models';
+import { PujiStore } from '../state/PujiStore';
+import { PUJI_COLORS, PUJI_TABS } from '../theme/PujiTheme';
 
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World';
+  @State store: PujiStore = new PujiStore();
+
+  aboutToAppear(): void {
+    const context = this.getUIContext().getHostContext() as common.Context;
+    this.store.initialize(context).catch((error: Error) => {
+      this.store.message = error.message;
+    });
+  }
+
+  @Builder
+  tabItem(index: number) {
+    Column({ space: 3 }) {
+      Text(PUJI_TABS[index].symbol)
+        .fontSize(index === 2 ? 23 : 20)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.store.selectedTab === index
+          ? (PUJI_TABS[index].accent ? PUJI_COLORS.scanAccent : PUJI_COLORS.primary)
+          : PUJI_COLORS.inkMuted)
+      Text(PUJI_TABS[index].label)
+        .fontSize(11)
+        .fontWeight(this.store.selectedTab === index ? FontWeight.Bold : FontWeight.Regular)
+        .fontColor(this.store.selectedTab === index
+          ? (PUJI_TABS[index].accent ? PUJI_COLORS.scanAccent : PUJI_COLORS.primary)
+          : PUJI_COLORS.inkMuted)
+    }
+    .justifyContent(FlexAlign.Center)
+    .width('100%')
+    .height(58)
+  }
 
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('HelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
-        .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
+    Tabs({ barPosition: BarPosition.End, index: this.store.selectedTab }) {
+      TabContent() {
+        HomePage({
+          store: this.store,
+          onInbound: () => {
+            this.store.setDocumentType(DocumentType.INBOUND);
+            this.store.setTab(2);
+          },
+          onOutbound: () => {
+            this.store.setDocumentType(DocumentType.OUTBOUND);
+            this.store.setTab(2);
+          }
         })
-        .onClick(() => {
-          this.message = 'Welcome';
-        })
+      }
+      .tabBar(this.tabItem(0))
+
+      TabContent() {
+        InventoryPage({ store: this.store })
+      }
+      .tabBar(this.tabItem(1))
+
+      TabContent() {
+        ScannerPage({ store: this.store })
+      }
+      .tabBar(this.tabItem(2))
+
+      TabContent() {
+        RecordsPage({ store: this.store })
+      }
+      .tabBar(this.tabItem(3))
     }
-    .height('100%')
+    .barHeight(66)
+    .barBackgroundColor(PUJI_COLORS.surface)
+    .backgroundColor(PUJI_COLORS.background)
+    .onChange((index: number) => {
+      this.store.setTab(index);
+    })
     .width('100%')
+    .height('100%')
   }
 }
