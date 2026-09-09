@@ -2,14 +2,17 @@ import { relationalStore } from '@kit.ArkData';
 import { Cart, CartLine } from '../domain/Cart';
 import { nextStock, validateCart } from '../domain/InventoryRules';
 import { DocumentType } from '../model/Models';
-import type { DateRange, DocumentLine, StockDocument } from '../model/Models';
+import type { DateRange, DocumentLine, Product, StockDocument } from '../model/Models';
 import { PujiDatabase } from './PujiDatabase';
+import { ProductRepository } from './ProductRepository';
 
 export class InventoryRepository {
   private readonly database: PujiDatabase;
+  private readonly productRepository: ProductRepository;
 
   constructor(database: PujiDatabase) {
     this.database = database;
+    this.productRepository = new ProductRepository(database);
   }
 
   async commit(cart: Cart, note: string = ''): Promise<StockDocument> {
@@ -21,8 +24,54 @@ export class InventoryRepository {
     const store = await this.database.getStore();
     store.beginTransaction();
     try {
-      const now = Date.now();
-      const documentValues: relationalStore.ValuesBucket = {
+      const document = await this.persistDocument(store, cart, note);
+      store.commit();
+      return document;
+    } catch (error) {
+      store.rollBack();
+      throw new Error(`${error}`);
+    }
+  }
+
+  async createProductAndCommitInbound(product: Product, quantity: number): Promise<StockDocument> {
+    const store = await this.database.getStore();
+    store.beginTransaction();
+    try {
+      const saved = await this.productRepository.save({
+        id: product.id,
+        name: product.name,
+        barcode: product.barcode,
+        category: product.category,
+        costPriceCents: product.costPriceCents,
+        salePriceCents: product.salePriceCents,
+        stockQuantity: 0,
+        lowStockThreshold: product.lowStockThreshold,
+        note: product.note,
+        active: product.active,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      });
+      const cart = Cart.empty(DocumentType.INBOUND).add(saved, quantity);
+      const validation = validateCart(cart);
+      if (validation !== null) {
+        throw new Error(validation);
+      }
+      const document = await this.persistDocument(store, cart, '');
+      store.commit();
+      return document;
+    } catch (error) {
+      store.rollBack();
+      throw new Error(`${error}`);
+    }
+  }
+
+  private async persistDocument(
+    store: relationalStore.RdbStore,
+    cart: Cart,
+    note: string
+  ): Promise<StockDocument> {
+    const now = Date.now();
+    const documentValues: relationalStore.ValuesBucket = {
         'type': cart.type,
         'total_cents': cart.totalCents(),
         'note': note.trim(),
@@ -86,19 +135,14 @@ export class InventoryRepository {
         });
       }
 
-      store.commit();
-      return {
-        id: documentId,
-        type: cart.type,
-        totalCents: cart.totalCents(),
-        note: note.trim(),
-        createdAt: now,
-        lines: savedLines
-      };
-    } catch (error) {
-      store.rollBack();
-      throw new Error(`${error}`);
-    }
+    return {
+      id: documentId,
+      type: cart.type,
+      totalCents: cart.totalCents(),
+      note: note.trim(),
+      createdAt: now,
+      lines: savedLines
+    };
   }
 
   async documents(

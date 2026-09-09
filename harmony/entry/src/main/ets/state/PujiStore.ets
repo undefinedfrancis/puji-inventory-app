@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { Cart } from '../domain/Cart';
-import { customDateRange, monthRange, quarterRange, yearRange } from '../domain/Periods';
+import { LatestRequestGate } from '../domain/LatestRequestGate';
+import { customDateRange, monthRange, quarterRange, shiftPeriodAnchor, yearRange } from '../domain/Periods';
 import { ScanGate } from '../domain/ScanGate';
 import { InventoryRepository } from '../data/InventoryRepository';
 import { ProductRepository } from '../data/ProductRepository';
@@ -60,6 +61,8 @@ export class PujiStore {
   message: string = '';
 
   private readonly scanGate: ScanGate = new ScanGate();
+  private readonly ledgerRequestGate: LatestRequestGate = new LatestRequestGate();
+  private readonly summaryRequestGate: LatestRequestGate = new LatestRequestGate();
   private productRepository: ProductRepository | null = null;
   private inventoryRepository: InventoryRepository | null = null;
   private reportingRepository: ReportingRepository | null = null;
@@ -120,21 +123,43 @@ export class PujiStore {
     if (this.reportingRepository === null) {
       return;
     }
-    this.summary = await this.reportingRepository.summary(this.currentPeriodRange(), this.periodKind);
+    const requestVersion = this.summaryRequestGate.begin();
+    const range = this.currentPeriodRange();
+    const kind = this.periodKind;
+    try {
+      const summary = await this.reportingRepository.summary(range, kind);
+      if (this.summaryRequestGate.isLatest(requestVersion)) {
+        this.summary = summary;
+      }
+    } catch (error) {
+      if (this.summaryRequestGate.isLatest(requestVersion)) {
+        this.message = `汇总加载失败：${error}`;
+      }
+    }
   }
 
   async loadLedger(type: DocumentType | null = null): Promise<void> {
     if (this.inventoryRepository === null) {
       return;
     }
-    this.ledgerDocuments = await this.inventoryRepository.documents(type, monthRange(this.ledgerAnchorMs));
+    const requestVersion = this.ledgerRequestGate.begin();
+    const range = monthRange(this.ledgerAnchorMs);
+    try {
+      const documents = await this.inventoryRepository.documents(type, range);
+      if (this.ledgerRequestGate.isLatest(requestVersion)) {
+        this.ledgerDocuments = documents;
+      }
+    } catch (error) {
+      if (this.ledgerRequestGate.isLatest(requestVersion)) {
+        this.message = `流水加载失败：${error}`;
+      }
+    }
   }
 
   async moveLedgerMonth(offset: number, type: DocumentType | null = null): Promise<void> {
-    const anchor = new Date(this.ledgerAnchorMs);
-    anchor.setMonth(anchor.getMonth() + offset);
-    if (anchor.getTime() <= Date.now()) {
-      this.ledgerAnchorMs = anchor.getTime();
+    const shifted = shiftPeriodAnchor(this.ledgerAnchorMs, PeriodKind.MONTH, offset);
+    if (shifted <= Date.now()) {
+      this.ledgerAnchorMs = shifted;
       await this.loadLedger(type);
     }
   }
@@ -210,9 +235,7 @@ export class PujiStore {
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       };
-      const saved = await this.productRepository.save(zeroStockProduct);
-      const exactCart = Cart.empty(DocumentType.INBOUND).add(saved, quantity);
-      await this.inventoryRepository.commit(exactCart);
+      await this.inventoryRepository.createProductAndCommitInbound(zeroStockProduct, quantity);
       this.pendingBarcode = '';
       this.cart = Cart.empty(this.documentType);
       this.scanGate.complete();
@@ -276,6 +299,9 @@ export class PujiStore {
       this.pendingBarcode = '';
       this.scanGate.cancel();
       this.message = '全部记录已清除';
+    } catch (error) {
+      this.message = `清除失败：${error}`;
+      throw new Error(`${error}`);
     } finally {
       this.busy = false;
     }
@@ -288,16 +314,9 @@ export class PujiStore {
   }
 
   movePeriod(offset: number): void {
-    const anchor = new Date(this.periodAnchorMs);
-    if (this.periodKind === PeriodKind.MONTH) {
-      anchor.setMonth(anchor.getMonth() + offset);
-    } else if (this.periodKind === PeriodKind.QUARTER) {
-      anchor.setMonth(anchor.getMonth() + offset * 3);
-    } else {
-      anchor.setFullYear(anchor.getFullYear() + offset);
-    }
-    if (anchor.getTime() <= Date.now()) {
-      this.periodAnchorMs = anchor.getTime();
+    const shifted = shiftPeriodAnchor(this.periodAnchorMs, this.periodKind, offset);
+    if (shifted <= Date.now()) {
+      this.periodAnchorMs = shifted;
       this.reloadSummary();
     }
   }

@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  canMovePeriodForward,
   customDateRange,
   monthRange,
   parseLocalDate,
   quarterRange,
+  shiftPeriodAnchor,
   yearRange
 } from '../entry/src/main/ets/domain/Periods.ets';
+import { PeriodKind } from '../entry/src/main/ets/model/Models.ets';
 
 test('builds a local January range', () => {
   const range = monthRange(new Date(2026, 0, 18, 12).getTime());
@@ -63,4 +66,18 @@ test('rejects impossible or loosely formatted dates', () => {
   assert.equal(parseLocalDate('2026-02-30'), null);
   assert.equal(parseLocalDate('2026-9-8'), null);
   assert.equal(parseLocalDate('not-a-date'), null);
+});
+
+test('moves safely from the last day of a month', () => {
+  const march31 = new Date(2026, 2, 31, 12).getTime();
+  assert.equal(
+    shiftPeriodAnchor(march31, PeriodKind.MONTH, -1),
+    new Date(2026, 1, 1).getTime()
+  );
+});
+
+test('allows moving forward only while the next period is not in the future', () => {
+  const now = new Date(2026, 8, 9, 12).getTime();
+  assert.equal(canMovePeriodForward(new Date(2026, 6, 1).getTime(), PeriodKind.MONTH, now), true);
+  assert.equal(canMovePeriodForward(new Date(2026, 8, 1).getTime(), PeriodKind.MONTH, now), false);
 });

@@ -20,10 +20,11 @@ function formatLocalTime(timestamp: number, date: Date): string {
 }
 
 export function escapeCsv(value: string): string {
-  if (!/[",\r\n]/.test(value)) {
-    return value;
+  const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  if (!/[",\r\n]/.test(safeValue)) {
+    return safeValue;
   }
-  return `"${value.replace(/"/g, '""')}"`;
+  return `"${safeValue.replace(/"/g, '""')}"`;
 }
 
 export function exportProducts(products: Product[]): string {

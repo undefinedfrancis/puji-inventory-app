@@ -1,5 +1,14 @@
 import { describe, expect, it } from '@ohos/hypium';
-import { customDateRange, monthRange, parseLocalDate, quarterRange, yearRange } from '../main/ets/domain/Periods';
+import {
+  canMovePeriodForward,
+  customDateRange,
+  monthRange,
+  parseLocalDate,
+  quarterRange,
+  shiftPeriodAnchor,
+  yearRange
+} from '../main/ets/domain/Periods';
+import { PeriodKind } from '../main/ets/model/Models';
 
 export default function periodsTest(): void {
   describe('Periods', () => {
@@ -47,6 +56,15 @@ export default function periodsTest(): void {
       expect(parseLocalDate('2026-09-08')).assertEqual(new Date(2026, 8, 8).getTime());
       expect(parseLocalDate('2026-02-30')).assertNull();
       expect(parseLocalDate('2026-9-8')).assertNull();
+    });
+
+    it('movesSafelyFromMonthEnd', 0, () => {
+      const shifted = shiftPeriodAnchor(
+        new Date(2026, 2, 31, 12).getTime(),
+        PeriodKind.MONTH,
+        -1
+      );
+      expect(shifted).assertEqual(new Date(2026, 1, 1).getTime());
     });
   });
 }

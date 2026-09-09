@@ -1,5 +1,6 @@
 import { EmptyState, MetricCard, PageHeader, SectionTitle } from '../components/CommonComponents';
 import { formatMoney } from '../domain/Money';
+import { canMovePeriodForward } from '../domain/Periods';
 import { PeriodKind } from '../model/Models';
 import type { TrendPoint } from '../model/Models';
 import { LedgerPage } from './LedgerPage';
@@ -76,9 +77,11 @@ export struct RecordsPage {
           Button('›')
             .width(48)
             .height(48)
-            .fontColor(PUJI_COLORS.inkMuted)
-            .backgroundColor(PUJI_COLORS.surfaceMuted)
-            .enabled(false)
+            .fontColor(canMovePeriodForward(this.store.periodAnchorMs, this.store.periodKind, Date.now())
+              ? PUJI_COLORS.primary : PUJI_COLORS.inkMuted)
+            .backgroundColor(PUJI_COLORS.surface)
+            .enabled(canMovePeriodForward(this.store.periodAnchorMs, this.store.periodKind, Date.now()))
+            .onClick(() => this.store.movePeriod(1))
         }
 
         Grid() {

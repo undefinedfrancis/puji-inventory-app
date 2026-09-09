@@ -21,7 +21,7 @@ export struct HomePage {
       ]
     });
     if (result.index === 1) {
-      await this.store.clearAll();
+      await this.store.clearAll().catch(() => {});
     }
   }
 

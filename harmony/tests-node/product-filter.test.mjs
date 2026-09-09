@@ -23,3 +23,10 @@ test('matches product names and treats 全部 as no category filter', () => {
     [3]
   );
 });
+
+test('falls back to all products when a previously selected category no longer exists', () => {
+  assert.deepEqual(
+    filterProducts(PRODUCTS, '', '已清除的旧类别').map((product) => product.id),
+    [1, 2, 3]
+  );
+});
