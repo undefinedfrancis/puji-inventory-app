@@ -13,8 +13,8 @@ function twoDigits(value: number): string {
   return value.toString().padStart(2, '0');
 }
 
-function formatLocalTime(timestamp: number): string {
-  const date = new Date(timestamp);
+function formatLocalTime(timestamp: number, date: Date): string {
+  date.setTime(timestamp);
   return `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())} ` +
     `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
 }
@@ -49,6 +49,7 @@ export function exportDocuments(documents: StockDocument[]): string {
   const rows: string[] = [
     '单据号,类型,时间,商品名称,条码,数量,单价,金额,成本金额,毛利润,备注'
   ];
+  const reusableDate = new Date(0);
   documents.forEach((document: StockDocument) => {
     document.lines.forEach((line) => {
       const lineTotal = line.unitPriceCents * line.quantity;
@@ -59,7 +60,7 @@ export function exportDocuments(documents: StockDocument[]): string {
       rows.push([
         document.id.toString(),
         document.type === DocumentType.INBOUND ? '入货' : '出货',
-        formatLocalTime(document.createdAt),
+        formatLocalTime(document.createdAt, reusableDate),
         escapeCsv(line.productName),
         escapeCsv(line.barcode),
         line.quantity.toString(),

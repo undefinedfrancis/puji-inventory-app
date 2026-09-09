@@ -99,6 +99,7 @@ export struct ScannerPage {
             .height(52)
             .backgroundColor(PUJI_COLORS.surface)
             .borderRadius(16)
+            .enabled(!this.store.busy && this.store.pendingBarcode.length === 0)
             .onChange((value: string) => {
               this.manualBarcode = value;
             })
@@ -107,6 +108,7 @@ export struct ScannerPage {
             .fontColor(Color.White)
             .backgroundColor(PUJI_COLORS.scanAccent)
             .borderRadius(16)
+            .enabled(!this.store.busy && this.store.pendingBarcode.length === 0 && this.manualBarcode.trim().length > 0)
             .onClick(() => {
               this.store.scanBarcode(this.manualBarcode).then(() => {
                 if (this.store.pendingBarcode.length === 0) {
@@ -121,10 +123,13 @@ export struct ScannerPage {
             barcode: this.store.pendingBarcode,
             busy: this.store.busy,
             onSave: (product, quantity: number) => {
-              this.store.saveUnknownInbound(product, quantity);
+              this.store.saveUnknownInbound(product, quantity).then(() => {
+                this.manualBarcode = '';
+              }).catch(() => {});
             },
             onCancel: () => {
               this.store.cancelPendingScan();
+              this.manualBarcode = '';
             }
           })
         } else if (this.store.cart.lines.length === 0) {
@@ -194,7 +199,7 @@ export struct ScannerPage {
           .borderRadius(18)
           .enabled(this.store.cart.lines.length > 0 && !this.store.busy && this.store.pendingBarcode.length === 0)
           .onClick(() => {
-            this.store.commitCart();
+            this.store.commitCart().catch(() => {});
           })
       }
       .padding({ top: 22, right: PUJI_LAYOUT.pagePadding, bottom: 30, left: PUJI_LAYOUT.pagePadding })

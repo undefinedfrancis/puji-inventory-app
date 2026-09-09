@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { EmptyState, PageHeader, SectionTitle } from '../components/CommonComponents';
 import { formatMoney } from '../domain/Money';
+import { filterProducts } from '../domain/ProductFilter';
 import { CsvShareService } from '../export/CsvShareService';
 import type { CategoryCount, Product } from '../model/Models';
 import { PujiStore } from '../state/PujiStore';
@@ -17,7 +18,10 @@ export struct InventoryPage {
 
   private selectCategory(category: string): void {
     this.selectedCategory = category;
-    this.store.reloadProducts(this.query, category);
+  }
+
+  private visibleProducts(): Product[] {
+    return filterProducts(this.store.products, this.query, this.selectedCategory);
   }
 
   private async exportInventory(): Promise<void> {
@@ -51,7 +55,6 @@ export struct InventoryPage {
         .border({ width: 1, color: PUJI_COLORS.line })
         .onChange((value: string) => {
           this.query = value;
-          this.store.reloadProducts(value, this.selectedCategory);
         })
 
       Scroll() {
@@ -86,11 +89,11 @@ export struct InventoryPage {
       .width('100%')
 
       SectionTitle({ title: this.selectedCategory === '全部' ? '全部商品' : this.selectedCategory })
-      if (this.store.products.length === 0) {
+      if (this.visibleProducts().length === 0) {
         EmptyState({ title: '还没有商品', message: '前往扫码页输入条码，即可录入第一件商品。' })
       } else {
         List({ space: 8 }) {
-          ForEach(this.store.products, (product: Product) => {
+          ForEach(this.visibleProducts(), (product: Product) => {
             ListItem() {
               Row({ space: 12 }) {
                 Column({ space: 5 }) {

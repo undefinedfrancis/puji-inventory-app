@@ -101,11 +101,11 @@ export class PujiStore {
     await this.reloadSummary();
   }
 
-  async reloadProducts(query: string = '', category: string = ''): Promise<void> {
+  async reloadProducts(): Promise<void> {
     if (this.productRepository === null) {
       return;
     }
-    this.products = await this.productRepository.list(query, category);
+    this.products = await this.productRepository.list('', '');
     this.categories = await this.productRepository.categoryCounts();
   }
 
