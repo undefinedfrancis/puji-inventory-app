@@ -10,3 +10,12 @@ test('accepts only the newest asynchronous request result', () => {
   assert.equal(gate.isLatest(first), false);
   assert.equal(gate.isLatest(second), true);
 });
+
+test('invalidates a request that was running before a reset', () => {
+  const gate = new LatestRequestGate();
+  const pending = gate.begin();
+
+  gate.invalidate();
+
+  assert.equal(gate.isLatest(pending), false);
+});

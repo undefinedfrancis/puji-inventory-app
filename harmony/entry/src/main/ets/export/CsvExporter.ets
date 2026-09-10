@@ -20,7 +20,7 @@ function formatLocalTime(timestamp: number, date: Date): string {
 }
 
 export function escapeCsv(value: string): string {
-  const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  const safeValue = /^[\u0000-\u0020]*[=+\-@]/.test(value) ? `'${value}` : value;
   if (!/[",\r\n]/.test(safeValue)) {
     return safeValue;
   }

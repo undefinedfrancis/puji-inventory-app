@@ -17,4 +17,5 @@ test('unknown product registration uses the atomic create-and-inbound operation'
 test('reset failures are surfaced to the user', async () => {
   const source = await readFile(new URL('../entry/src/main/ets/state/PujiStore.ets', import.meta.url), 'utf8');
   assert.match(source, /清除失败/);
+  assert.match(source, /invalidatePendingReads\(\)/);
 });

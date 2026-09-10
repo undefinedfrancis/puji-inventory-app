@@ -61,6 +61,8 @@ export class PujiStore {
   message: string = '';
 
   private readonly scanGate: ScanGate = new ScanGate();
+  private readonly productsRequestGate: LatestRequestGate = new LatestRequestGate();
+  private readonly dashboardRequestGate: LatestRequestGate = new LatestRequestGate();
   private readonly ledgerRequestGate: LatestRequestGate = new LatestRequestGate();
   private readonly summaryRequestGate: LatestRequestGate = new LatestRequestGate();
   private productRepository: ProductRepository | null = null;
@@ -108,15 +110,36 @@ export class PujiStore {
     if (this.productRepository === null) {
       return;
     }
-    this.products = await this.productRepository.list('', '');
-    this.categories = await this.productRepository.categoryCounts();
+    const requestVersion = this.productsRequestGate.begin();
+    try {
+      const products = await this.productRepository.list('', '');
+      const categories = await this.productRepository.categoryCounts();
+      if (this.productsRequestGate.isLatest(requestVersion)) {
+        this.products = products;
+        this.categories = categories;
+      }
+    } catch (error) {
+      if (this.productsRequestGate.isLatest(requestVersion)) {
+        this.message = `商品加载失败：${error}`;
+      }
+    }
   }
 
   async reloadDashboard(): Promise<void> {
     if (this.reportingRepository === null) {
       return;
     }
-    this.dashboard = await this.reportingRepository.dashboard();
+    const requestVersion = this.dashboardRequestGate.begin();
+    try {
+      const dashboard = await this.reportingRepository.dashboard();
+      if (this.dashboardRequestGate.isLatest(requestVersion)) {
+        this.dashboard = dashboard;
+      }
+    } catch (error) {
+      if (this.dashboardRequestGate.isLatest(requestVersion)) {
+        this.message = `概况加载失败：${error}`;
+      }
+    }
   }
 
   async reloadSummary(): Promise<void> {
@@ -286,6 +309,7 @@ export class PujiStore {
       return;
     }
     this.busy = true;
+    this.invalidatePendingReads();
     try {
       await this.resetRepository.clearAll();
       this.products = [];
@@ -305,6 +329,13 @@ export class PujiStore {
     } finally {
       this.busy = false;
     }
+  }
+
+  private invalidatePendingReads(): void {
+    this.productsRequestGate.invalidate();
+    this.dashboardRequestGate.invalidate();
+    this.ledgerRequestGate.invalidate();
+    this.summaryRequestGate.invalidate();
   }
 
   setPeriod(kind: PeriodKind): void {

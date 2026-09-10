@@ -9,4 +9,8 @@ export class LatestRequestGate {
   isLatest(requestVersion: number): boolean {
     return requestVersion === this.version;
   }
+
+  invalidate(): void {
+    this.version += 1;
+  }
 }

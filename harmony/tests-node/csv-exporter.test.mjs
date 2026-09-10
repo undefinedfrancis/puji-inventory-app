@@ -18,6 +18,8 @@ test('neutralizes spreadsheet formulas in user-entered cells', () => {
   assert.equal(escapeCsv('+SUM(A1:A2)'), "'+SUM(A1:A2)");
   assert.equal(escapeCsv('-2+3'), "'-2+3");
   assert.equal(escapeCsv('@cmd'), "'@cmd");
+  assert.equal(escapeCsv('\t=1+1'), "'\t=1+1");
+  assert.equal(escapeCsv('  =1+1'), "'  =1+1");
 });
 
 test('exports products with UTF-8 BOM and stock columns', () => {
