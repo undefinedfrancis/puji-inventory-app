@@ -30,11 +30,11 @@ export class ReportingRepository {
     try {
       resultSet.goToFirstRow();
       return {
-        todaySalesCents: resultSet.getLong(resultSet.getColumnIndex('sales')),
-        todayItemCount: resultSet.getLong(resultSet.getColumnIndex('item_count')),
-        productCount: resultSet.getLong(resultSet.getColumnIndex('product_count')),
-        lowStockCount: resultSet.getLong(resultSet.getColumnIndex('low_stock_count')),
-        inventoryValueCents: resultSet.getLong(resultSet.getColumnIndex('inventory_value'))
+        todaySalesCents: resultSet.getLong(0),
+        todayItemCount: resultSet.getLong(1),
+        productCount: resultSet.getLong(2),
+        lowStockCount: resultSet.getLong(3),
+        inventoryValueCents: resultSet.getLong(4)
       };
     } finally {
       resultSet.close();

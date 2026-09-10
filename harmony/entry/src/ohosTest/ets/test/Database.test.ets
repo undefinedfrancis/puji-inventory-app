@@ -5,6 +5,11 @@ import { Product } from '../../../main/ets/model/Models';
 import { PujiDatabase } from '../../../main/ets/data/PujiDatabase';
 import { ProductRepository } from '../../../main/ets/data/ProductRepository';
 
+async function testContext(): Promise<common.Context> {
+  const ability = await abilityDelegatorRegistry.getAbilityDelegator().getCurrentTopAbility();
+  return ability.context;
+}
+
 function newProduct(barcode: string, name: string): Product {
   return {
     id: 0,
@@ -25,7 +30,7 @@ function newProduct(barcode: string, name: string): Product {
 export default function databaseTest(): void {
   describe('PujiDatabase', () => {
     it('createsFourBusinessTables', 0, async () => {
-      const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext() as common.Context;
+      const context = await testContext();
       const store = await new PujiDatabase(context).getStore();
       const resultSet = await store.querySql(
         `SELECT name FROM sqlite_master
@@ -40,7 +45,7 @@ export default function databaseTest(): void {
     });
 
     it('rejectsDuplicateNonEmptyBarcode', 0, async () => {
-      const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext() as common.Context;
+      const context = await testContext();
       const repository = new ProductRepository(new PujiDatabase(context));
       const barcode = `TEST-${Date.now()}`;
       await repository.save(newProduct(barcode, '条码商品一'));
@@ -54,7 +59,7 @@ export default function databaseTest(): void {
     });
 
     it('allowsMultipleEmptyBarcodes', 0, async () => {
-      const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext() as common.Context;
+      const context = await testContext();
       const repository = new ProductRepository(new PujiDatabase(context));
       const suffix = Date.now().toString();
       const first = await repository.save(newProduct('', `无条码一-${suffix}`));

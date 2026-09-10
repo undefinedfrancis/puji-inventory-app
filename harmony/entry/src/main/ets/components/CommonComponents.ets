@@ -2,8 +2,8 @@ import { PUJI_COLORS, PUJI_LAYOUT } from '../theme/PujiTheme';
 
 @Component
 export struct PageHeader {
-  title: string = '';
-  subtitle: string = '';
+  @Prop title: string = '';
+  @Prop subtitle: string = '';
 
   build() {
     Column({ space: 6 }) {
@@ -27,8 +27,8 @@ export struct PageHeader {
 
 @Component
 export struct SectionTitle {
-  title: string = '';
-  action: string = '';
+  @Prop title: string = '';
+  @Prop action: string = '';
   onAction: () => void = () => {};
 
   build() {
@@ -54,10 +54,10 @@ export struct SectionTitle {
 
 @Component
 export struct MetricCard {
-  label: string = '';
-  value: string = '';
-  detail: string = '';
-  emphasis: boolean = false;
+  @Prop label: string = '';
+  @Prop value: string = '';
+  @Prop detail: string = '';
+  @Prop emphasis: boolean = false;
 
   build() {
     Column({ space: 8 }) {
@@ -89,8 +89,8 @@ export struct MetricCard {
 
 @Component
 export struct EmptyState {
-  title: string = '';
-  message: string = '';
+  @Prop title: string = '';
+  @Prop message: string = '';
 
   build() {
     Column({ space: 9 }) {

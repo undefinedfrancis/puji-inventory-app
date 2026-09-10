@@ -69,15 +69,18 @@ export class ProductRepository {
     const store = await this.database.getStore();
     const now = Date.now();
     const createdAt = product.createdAt > 0 ? product.createdAt : now;
+    const barcode = product.barcode.trim();
+    const category = product.category.trim().length === 0 ? '未分类' : product.category.trim();
+    const note = product.note.trim();
     const values: relationalStore.ValuesBucket = {
       'name': name,
-      'barcode': product.barcode.trim(),
-      'category': product.category.trim().length === 0 ? '未分类' : product.category.trim(),
+      'barcode': barcode,
+      'category': category,
       'cost_price_cents': Math.trunc(product.costPriceCents),
       'sale_price_cents': Math.trunc(product.salePriceCents),
       'stock_quantity': Math.trunc(product.stockQuantity),
       'low_stock_threshold': Math.trunc(product.lowStockThreshold),
-      'note': product.note.trim(),
+      'note': note,
       'active': product.active ? 1 : 0,
       'created_at': createdAt,
       'updated_at': now
@@ -86,6 +89,20 @@ export class ProductRepository {
     let id = product.id;
     if (id <= 0) {
       id = await store.insert('products', values);
+      return {
+        id,
+        name,
+        barcode,
+        category,
+        costPriceCents: Math.trunc(product.costPriceCents),
+        salePriceCents: Math.trunc(product.salePriceCents),
+        stockQuantity: Math.trunc(product.stockQuantity),
+        lowStockThreshold: Math.trunc(product.lowStockThreshold),
+        note,
+        active: product.active,
+        createdAt,
+        updatedAt: now
+      };
     } else {
       const predicates = new relationalStore.RdbPredicates('products');
       predicates.equalTo('id', id);

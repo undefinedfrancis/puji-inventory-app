@@ -4,8 +4,8 @@ import { PUJI_COLORS, PUJI_LAYOUT } from '../theme/PujiTheme';
 
 @Component
 export struct ProductEditor {
-  barcode: string = '';
-  busy: boolean = false;
+  @Prop barcode: string = '';
+  @Prop busy: boolean = false;
   onSave: (product: Product, quantity: number) => void = () => {};
   onCancel: () => void = () => {};
 

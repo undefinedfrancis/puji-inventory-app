@@ -11,6 +11,17 @@ export struct HomePage {
   onInbound: () => void = () => {};
   onOutbound: () => void = () => {};
 
+  private lowStockProducts(): Product[] {
+    return this.store.products.filter((product: Product) => product.stockQuantity <= product.lowStockThreshold);
+  }
+
+  private inventoryValueCents(): number {
+    return this.store.products.reduce(
+      (total: number, product: Product) => total + product.costPriceCents * product.stockQuantity,
+      0
+    );
+  }
+
   private async requestReset(): Promise<void> {
     const result = await this.getUIContext().getPromptAction().showDialog({
       title: '确认清除全部记录？',
@@ -59,19 +70,19 @@ export struct HomePage {
           GridItem() {
             MetricCard({
               label: '今日销售',
-              value: formatMoney(this.store.dashboard.todaySalesCents),
-              detail: `${this.store.dashboard.todayItemCount} 件商品`,
+              value: formatMoney(this.store.todaySalesCents),
+              detail: `${this.store.todayItemCount} 件商品`,
               emphasis: true
             })
           }
           GridItem() {
-            MetricCard({ label: '库存货值', value: formatMoney(this.store.dashboard.inventoryValueCents), detail: '按进货价估算' })
+            MetricCard({ label: '库存货值', value: formatMoney(this.inventoryValueCents()), detail: '按进货价估算' })
           }
           GridItem() {
-            MetricCard({ label: '商品总数', value: this.store.dashboard.productCount.toString(), detail: '在售商品' })
+            MetricCard({ label: '商品总数', value: this.store.products.length.toString(), detail: '在售商品' })
           }
           GridItem() {
-            MetricCard({ label: '低库存', value: this.store.dashboard.lowStockCount.toString(), detail: '需要补货' })
+            MetricCard({ label: '低库存', value: this.lowStockProducts().length.toString(), detail: '需要补货' })
           }
         }
         .columnsTemplate('1fr 1fr')
@@ -79,12 +90,12 @@ export struct HomePage {
         .rowsGap(10)
 
         SectionTitle({ title: '补货提醒' })
-        if (this.store.products.filter((product: Product) => product.stockQuantity <= product.lowStockThreshold).length === 0) {
+        if (this.lowStockProducts().length === 0) {
           EmptyState({ title: '库存状态良好', message: '低于预警数量的商品会显示在这里。' })
         } else {
           Column({ space: 8 }) {
             ForEach(
-              this.store.products.filter((product: Product) => product.stockQuantity <= product.lowStockThreshold),
+              this.lowStockProducts(),
               (product: Product) => {
                 Row() {
                   Column({ space: 4 }) {

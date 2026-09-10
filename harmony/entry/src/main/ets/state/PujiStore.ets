@@ -13,7 +13,6 @@ import { DocumentType, PeriodKind } from '../model/Models';
 import type {
   BusinessSummary,
   CategoryCount,
-  DashboardStats,
   DateRange,
   Product,
   StockDocument
@@ -24,14 +23,6 @@ export enum ScanOutcome {
   KNOWN = 'KNOWN',
   UNKNOWN = 'UNKNOWN'
 }
-
-const EMPTY_DASHBOARD: DashboardStats = {
-  todaySalesCents: 0,
-  todayItemCount: 0,
-  productCount: 0,
-  lowStockCount: 0,
-  inventoryValueCents: 0
-};
 
 const EMPTY_SUMMARY: BusinessSummary = {
   salesRevenueCents: 0,
@@ -48,7 +39,11 @@ export class PujiStore {
   selectedTab: number = 0;
   products: Product[] = [];
   categories: CategoryCount[] = [];
-  dashboard: DashboardStats = EMPTY_DASHBOARD;
+  todaySalesCents: number = 0;
+  todayItemCount: number = 0;
+  productCount: number = 0;
+  lowStockCount: number = 0;
+  inventoryValueCents: number = 0;
   summary: BusinessSummary = EMPTY_SUMMARY;
   ledgerDocuments: StockDocument[] = [];
   ledgerAnchorMs: number = Date.now();
@@ -133,7 +128,11 @@ export class PujiStore {
     try {
       const dashboard = await this.reportingRepository.dashboard();
       if (this.dashboardRequestGate.isLatest(requestVersion)) {
-        this.dashboard = dashboard;
+        this.todaySalesCents = dashboard.todaySalesCents;
+        this.todayItemCount = dashboard.todayItemCount;
+        this.productCount = dashboard.productCount;
+        this.lowStockCount = dashboard.lowStockCount;
+        this.inventoryValueCents = dashboard.inventoryValueCents;
       }
     } catch (error) {
       if (this.dashboardRequestGate.isLatest(requestVersion)) {
@@ -314,7 +313,11 @@ export class PujiStore {
       await this.resetRepository.clearAll();
       this.products = [];
       this.categories = [];
-      this.dashboard = EMPTY_DASHBOARD;
+      this.todaySalesCents = 0;
+      this.todayItemCount = 0;
+      this.productCount = 0;
+      this.lowStockCount = 0;
+      this.inventoryValueCents = 0;
       this.summary = EMPTY_SUMMARY;
       this.ledgerDocuments = [];
       this.cart = Cart.empty(DocumentType.INBOUND);

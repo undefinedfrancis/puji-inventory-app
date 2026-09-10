@@ -56,7 +56,7 @@ export class InventoryRepository {
       if (validation !== null) {
         throw new Error(validation);
       }
-      const document = await this.persistDocument(store, cart, '');
+      const document = await this.persistDocument(store, cart, '', saved.id);
       store.commit();
       return document;
     } catch (error) {
@@ -68,7 +68,8 @@ export class InventoryRepository {
   private async persistDocument(
     store: relationalStore.RdbStore,
     cart: Cart,
-    note: string
+    note: string,
+    knownZeroStockProductId: number = -1
   ): Promise<StockDocument> {
     const now = Date.now();
     const documentValues: relationalStore.ValuesBucket = {
@@ -82,7 +83,9 @@ export class InventoryRepository {
 
       for (let index = 0; index < cart.lines.length; index += 1) {
         const line: CartLine = cart.lines[index];
-        const currentStock = await this.currentStock(store, line.product.id);
+        const currentStock = line.product.id === knownZeroStockProductId
+          ? 0
+          : await this.currentStock(store, line.product.id);
         const updatedStock = nextStock(cart.type, currentStock, line.quantity);
         if (updatedStock === null) {
           throw new Error(`商品“${line.product.name}”库存不足`);

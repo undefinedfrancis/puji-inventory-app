@@ -4,10 +4,16 @@ import { describe, expect, it } from '@ohos/hypium';
 import { InventoryRepository } from '../../../main/ets/data/InventoryRepository';
 import { ProductRepository } from '../../../main/ets/data/ProductRepository';
 import { PujiDatabase } from '../../../main/ets/data/PujiDatabase';
+import { ReportingRepository } from '../../../main/ets/data/ReportingRepository';
 import { monthRange } from '../../../main/ets/domain/Periods';
 import { DocumentType } from '../../../main/ets/model/Models';
 import type { Product } from '../../../main/ets/model/Models';
 import { PujiStore, ScanOutcome } from '../../../main/ets/state/PujiStore';
+
+async function testContext(): Promise<common.Context> {
+  const ability = await abilityDelegatorRegistry.getAbilityDelegator().getCurrentTopAbility();
+  return ability.context;
+}
 
 function inboundProduct(barcode: string): Product {
   return {
@@ -29,7 +35,7 @@ function inboundProduct(barcode: string): Product {
 export default function inventoryFlowTest(): void {
   describe('InventoryFlow', () => {
     it('persistsExactUnknownInboundQuantity', 0, async () => {
-      const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext() as common.Context;
+      const context = await testContext();
       const database = new PujiDatabase(context);
       const products = new ProductRepository(database);
       const inventory = new InventoryRepository(database);
@@ -55,6 +61,18 @@ export default function inventoryFlowTest(): void {
       }
       expect(failed).assertTrue();
       expect(await products.findByBarcode(rollbackBarcode)).assertNull();
+    });
+
+    it('reportsSeededProductsInDashboard', 0, async () => {
+      const context = await testContext();
+      const database = new PujiDatabase(context);
+      const inventory = new InventoryRepository(database);
+      const reporting = new ReportingRepository(database, inventory);
+      const products = await new ProductRepository(database).list('', '');
+      const dashboard = await reporting.dashboard();
+
+      expect(dashboard.productCount).assertEqual(products.length);
+      expect(dashboard.inventoryValueCents > 0).assertTrue();
     });
   });
 }
