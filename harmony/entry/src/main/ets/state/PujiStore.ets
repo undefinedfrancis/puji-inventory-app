@@ -78,6 +78,10 @@ export class PujiStore {
   }
 
   setTab(index: number): void {
+    if (this.busy) {
+      this.message = '正在处理，请稍候';
+      return;
+    }
     this.selectedTab = index;
     if (index === 1) {
       this.reloadProducts();
@@ -87,6 +91,9 @@ export class PujiStore {
   }
 
   setDocumentType(type: DocumentType): void {
+    if (this.busy) {
+      return;
+    }
     if (this.documentType === type) {
       return;
     }
@@ -212,8 +219,15 @@ export class PujiStore {
   }
 
   async scanBarcode(raw: string): Promise<ScanOutcome> {
+    if (this.busy) {
+      return ScanOutcome.IGNORED;
+    }
     const barcode = this.scanGate.accept(raw);
     if (barcode === null || this.productRepository === null) {
+      return ScanOutcome.IGNORED;
+    }
+    if (!this.tryBeginExclusiveOperation()) {
+      this.scanGate.cancel();
       return ScanOutcome.IGNORED;
     }
     try {
@@ -234,6 +248,8 @@ export class PujiStore {
       this.message = `${error}`;
       this.scanGate.cancel();
       return ScanOutcome.IGNORED;
+    } finally {
+      this.busy = false;
     }
   }
 
@@ -241,7 +257,9 @@ export class PujiStore {
     if (this.productRepository === null || this.inventoryRepository === null) {
       throw new Error('应用尚未初始化');
     }
-    this.busy = true;
+    if (!this.tryBeginExclusiveOperation()) {
+      throw new Error('正在处理，请稍候');
+    }
     try {
       const zeroStockProduct: Product = {
         id: product.id,
@@ -288,7 +306,9 @@ export class PujiStore {
     if (this.inventoryRepository === null) {
       return null;
     }
-    this.busy = true;
+    if (!this.tryBeginExclusiveOperation()) {
+      return null;
+    }
     try {
       const document = await this.inventoryRepository.commit(this.cart);
       this.cart = Cart.empty(this.documentType);
@@ -307,7 +327,9 @@ export class PujiStore {
     if (this.resetRepository === null) {
       return;
     }
-    this.busy = true;
+    if (!this.tryBeginExclusiveOperation()) {
+      return;
+    }
     this.invalidatePendingReads();
     try {
       await this.resetRepository.clearAll();
@@ -330,8 +352,18 @@ export class PujiStore {
       this.message = `清除失败：${error}`;
       throw new Error(`${error}`);
     } finally {
+      this.invalidatePendingReads();
       this.busy = false;
     }
+  }
+
+  private tryBeginExclusiveOperation(): boolean {
+    if (this.busy) {
+      this.message = '正在处理，请稍候';
+      return false;
+    }
+    this.busy = true;
+    return true;
   }
 
   private invalidatePendingReads(): void {

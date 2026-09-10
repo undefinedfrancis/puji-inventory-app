@@ -26,6 +26,17 @@ test('reset failures are surfaced to the user', async () => {
   assert.match(source, /invalidatePendingReads\(\)/);
 });
 
+test('reset, scanning and stock writes share one exclusive operation guard', async () => {
+  const storeSource = await readFile(new URL('../entry/src/main/ets/state/PujiStore.ets', import.meta.url), 'utf8');
+  const homeSource = await readFile(new URL('../entry/src/main/ets/pages/HomePage.ets', import.meta.url), 'utf8');
+  const guardCalls = storeSource.match(/tryBeginExclusiveOperation\(\)/g) ?? [];
+
+  assert.ok(guardCalls.length >= 4);
+  assert.match(storeSource, /finally \{\s+this\.invalidatePendingReads\(\);\s+this\.busy = false;/);
+  assert.match(storeSource, /setTab\(index: number\): void \{\s+if \(this\.busy\)/);
+  assert.match(homeSource, /\.enabled\(!this\.store\.busy\)/);
+});
+
 test('dashboard reads its fixed aggregate columns by position', async () => {
   const source = await readFile(new URL('../entry/src/main/ets/data/ReportingRepository.ets', import.meta.url), 'utf8');
   assert.match(source, /todaySalesCents: resultSet\.getLong\(0\)/);

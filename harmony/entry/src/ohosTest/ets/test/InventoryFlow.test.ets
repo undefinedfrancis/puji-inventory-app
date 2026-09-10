@@ -74,5 +74,21 @@ export default function inventoryFlowTest(): void {
       expect(dashboard.productCount).assertEqual(products.length);
       expect(dashboard.inventoryValueCents > 0).assertTrue();
     });
+
+    it('doesNotResetWhileAnotherOperationIsInFlight', 0, async () => {
+      const context = await testContext();
+      const database = new PujiDatabase(context);
+      const products = new ProductRepository(database);
+      const appStore = new PujiStore();
+      await appStore.initialize(context);
+      const countBefore = (await products.list('', '')).length;
+
+      appStore.busy = true;
+      await appStore.clearAll();
+      appStore.busy = false;
+
+      expect((await products.list('', '')).length).assertEqual(countBefore);
+      expect(appStore.message).assertEqual('正在处理，请稍候');
+    });
   });
 }

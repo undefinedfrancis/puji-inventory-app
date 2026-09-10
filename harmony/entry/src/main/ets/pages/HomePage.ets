@@ -138,6 +138,7 @@ export struct HomePage {
           Button('按住 2 秒清除全部记录')
             .height(52)
             .width('100%')
+            .enabled(!this.store.busy)
             .fontColor(PUJI_COLORS.danger)
             .backgroundColor('#F7DDD8')
             .borderRadius(16)
