@@ -1,0 +1,6 @@
+OK: res/2I.png (96x96 PNG)
+OK: res/3r.png (72x72 PNG)
+OK: res/ZK.png (48x48 PNG)
+OK: res/cV.png (192x192 PNG)
+OK: res/ip.png (144x144 PNG)
+APK bitmap icon extraction passed

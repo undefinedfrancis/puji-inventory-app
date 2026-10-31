@@ -1,0 +1,18 @@
+{
+  "version": "2.0.1",
+  "versionCode": 7,
+  "package": "cn.puji.app",
+  "apkSha256": "a10b097c7607aa98d94cfa9ccdf60dcc2cf22eb7ebd32738309a2a373132fa04",
+  "certificateSha256": "a0f5dfb7d389ddddba6d81c0f34e3b66dada4fd1cdcc9a36673fe9cf45ed5cb2",
+  "unitTests": {
+    "tests": 70,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Warning": 16
+  },
+  "bitmapIconExtraction": "passed: five PNG densities",
+  "pgyerUploadVerification": "not performed; user re-upload required"
+}
