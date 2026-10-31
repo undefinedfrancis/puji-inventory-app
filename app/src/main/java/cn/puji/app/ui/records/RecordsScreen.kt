@@ -1,172 +1,133 @@
 package cn.puji.app.ui.records
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cn.puji.app.domain.BusinessSummary
 import cn.puji.app.domain.DateRange
 import cn.puji.app.domain.Money
 import cn.puji.app.domain.PeriodKind
-import cn.puji.app.ui.components.Metric
-import cn.puji.app.ui.components.PageHeader
-import cn.puji.app.ui.components.ReceiptCard
-import cn.puji.app.ui.theme.Hairline
-import cn.puji.app.ui.theme.ScannerOrange
-import cn.puji.app.ui.theme.TicketGreen
+import cn.puji.app.ui.components.*
 
 @Composable
-fun RecordsScreen(
-    summary: BusinessSummary,
-    periodKind: PeriodKind,
-    range: DateRange,
-    canGoNext: Boolean,
-    onPeriodKindChange: (PeriodKind) -> Unit,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
-    onOpenLedger: () -> Unit,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item { PageHeader("Business / 经营", "经营记录") }
-        item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PeriodButton("月度", periodKind == PeriodKind.MONTH, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.MONTH) }
-                PeriodButton("季度", periodKind == PeriodKind.QUARTER, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.QUARTER) }
-                PeriodButton("年度", periodKind == PeriodKind.YEAR, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.YEAR) }
-            }
-        }
+fun RecordsScreen(summary: BusinessSummary, periodKind: PeriodKind, range: DateRange, canGoNext: Boolean,
+    onPeriodKindChange: (PeriodKind) -> Unit, onPrevious: () -> Unit, onNext: () -> Unit, onOpenLedger: () -> Unit) {
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        item { PageHeader("", "经营") }
+        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChoiceButton("月", periodKind == PeriodKind.MONTH, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.MONTH) }
+            ChoiceButton("季", periodKind == PeriodKind.QUARTER, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.QUARTER) }
+            ChoiceButton("年", periodKind == PeriodKind.YEAR, Modifier.weight(1f)) { onPeriodKindChange(PeriodKind.YEAR) }
+        } }
         item { PeriodNavigator(range.label, canGoNext, onPrevious, onNext) }
-        item {
-            ReceiptCard(accent = TicketGreen) {
-                Text("销售收入", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
-                Text(
-                    Money.format(summary.salesRevenueCents),
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = if (Money.format(summary.salesRevenueCents).length > 13) 27.sp else 38.sp,
-                    ),
-                    maxLines = 1,
-                    fontFamily = FontFamily.Monospace,
-                )
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("共 ${summary.transactionCount} 笔业务", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("毛利率 ${formatPercent(summary.grossMarginBasisPoints)}", fontWeight = FontWeight.Bold)
-                }
+        item { ReceiptCard(Modifier.fillMaxWidth()) {
+            AmountPair("销售额", Money.format(summary.salesRevenueCents), "进货额", Money.format(summary.purchaseExpenseCents))
+        } }
+        item { ReceiptCard(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Legend(MaterialTheme.colorScheme.primary, "销售")
+                Spacer(Modifier.width(16.dp)); Legend(MaterialTheme.colorScheme.secondary, "进货")
             }
-        }
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Metric("进货支出", Money.format(summary.purchaseExpenseCents), Modifier.weight(1f))
-                    Metric("毛利润", Money.format(summary.grossProfitCents), Modifier.weight(1f), summary.grossProfitCents < 0)
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Metric("现金结余", Money.format(summary.cashBalanceCents), Modifier.weight(1f), summary.cashBalanceCents < 0)
-                    Metric("交易笔数", "${summary.transactionCount}", Modifier.weight(1f))
-                }
+            if (summary.trend.none { it.revenueCents != 0L || it.expenseCents != 0L }) {
+                EmptyState("", "本周期暂无交易", "")
+            } else TrendChart(summary)
+        } }
+        item { ReceiptCard(Modifier.fillMaxWidth()) {
+            SummaryRow("毛利润", Money.format(summary.grossProfitCents), summary.grossProfitCents < 0)
+            PujiDivider()
+            SummaryRow("毛利率", "%.2f%%".format(summary.grossMarginBasisPoints / 100.0))
+            PujiDivider()
+            SummaryRow("进销差额", Money.format(summary.cashBalanceCents), summary.cashBalanceCents < 0)
+            PujiDivider()
+            SummaryRow("交易笔数", "${summary.transactionCount}")
+            if(summary.writeOffCostCents != 0L) { PujiDivider(); SummaryRow("报损成本", Money.format(summary.writeOffCostCents)) }
+            if(summary.stockLossCostCents != 0L) { PujiDivider(); SummaryRow("盘亏成本", Money.format(summary.stockLossCostCents)) }
+            if(summary.valuationDifferenceCents != 0L) { PujiDivider(); SummaryRow("库存估值差额", Money.format(summary.valuationDifferenceCents)) }
+            PujiDivider()
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClick = onOpenLedger), verticalAlignment = Alignment.CenterVertically) {
+                Text("流水", modifier = Modifier.weight(1f))
+                PujiIcon(PujiSymbol.ChevronRight, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-        }
-        item {
-            ReceiptCard {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("周期趋势", fontWeight = FontWeight.Black)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Legend(TicketGreen, "收入")
-                        Legend(ScannerOrange, "支出")
-                    }
-                }
-                if (summary.trend.none { it.revenueCents != 0L || it.expenseCents != 0L }) {
-                    Text(
-                        "本周期还没有流水",
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 42.dp),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else {
-                    TrendChart(summary)
-                }
-            }
-        }
-        item {
-            Button(onClick = onOpenLedger, modifier = Modifier.fillMaxWidth().height(54.dp)) {
-                Text("查阅流水与导出")
-            }
-        }
-        item { Spacer(Modifier.height(84.dp)) }
+        } }
     }
 }
 
 @Composable
-private fun PeriodButton(text: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    if (selected) Button(onClick = onClick, modifier = modifier) { Text(text) }
-    else OutlinedButton(onClick = onClick, modifier = modifier) { Text(text) }
+private fun SummaryRow(label: String, value: String, negative: Boolean = false) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(label, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.titleMedium,
+            color = if (negative) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
+    }
 }
 
 @Composable
 fun PeriodNavigator(label: String, canGoNext: Boolean, onPrevious: () -> Unit, onNext: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        OutlinedButton(onClick = onPrevious, modifier = Modifier.width(52.dp), contentPadding = PaddingValues(0.dp)) { Text("‹", fontSize = 24.sp) }
-        Text(label, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Black)
-        OutlinedButton(onClick = onNext, enabled = canGoNext, modifier = Modifier.width(52.dp), contentPadding = PaddingValues(0.dp)) { Text("›", fontSize = 24.sp) }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onPrevious) { PujiIcon(PujiSymbol.ChevronLeft, description = "上一周期") }
+        Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        IconButton(onClick = onNext, enabled = canGoNext) { PujiIcon(PujiSymbol.ChevronRight, description = "下一周期",
+            tint = if (canGoNext) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)) }
     }
 }
 
 @Composable
 private fun Legend(color: Color, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text("●", color = color, fontSize = 10.sp)
-        Text(text, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Canvas(Modifier.size(8.dp)) { drawCircle(color) }
+        Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 private fun TrendChart(summary: BusinessSummary) {
     val points = summary.trend
-    val grid = Hairline
-    Canvas(Modifier.fillMaxWidth().height(150.dp)) {
-        val maxValue = points.maxOfOrNull { maxOf(it.revenueCents, it.expenseCents) }?.coerceAtLeast(1L) ?: 1L
-        val baseline = size.height - 8.dp.toPx()
-        drawLine(grid, Offset(0f, baseline), Offset(size.width, baseline), strokeWidth = 1.dp.toPx())
-        val slot = size.width / points.size.coerceAtLeast(1)
-        val barWidth = (slot * .28f).coerceAtMost(8.dp.toPx())
-        points.forEachIndexed { index, point ->
-            val center = slot * index + slot / 2f
-            val revenueHeight = (point.revenueCents.toFloat() / maxValue) * (baseline - 8.dp.toPx())
-            val expenseHeight = (point.expenseCents.toFloat() / maxValue) * (baseline - 8.dp.toPx())
-            drawRect(TicketGreen, Offset(center - barWidth, baseline - revenueHeight), Size(barWidth, revenueHeight))
-            drawRect(ScannerOrange, Offset(center + 1.dp.toPx(), baseline - expenseHeight), Size(barWidth, expenseHeight))
+    val grid = MaterialTheme.colorScheme.outlineVariant
+    val revenue = MaterialTheme.colorScheme.primary
+    val expense = MaterialTheme.colorScheme.secondary
+    val maxValue = points.maxOfOrNull { maxOf(it.revenueCents, it.expenseCents) }?.coerceAtLeast(1L) ?: 1L
+    val minValue = points.minOfOrNull { minOf(0L, it.revenueCents, it.expenseCents) } ?: 0L
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(if(minValue < 0) "${Money.format(minValue)} 至 ${Money.format(maxValue)}" else "最高 ${Money.format(maxValue)}",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Canvas(Modifier.fillMaxWidth().height(160.dp).semantics {
+            contentDescription = "销售与进货趋势。" + points.joinToString("；") { "${it.label}销售${Money.format(it.revenueCents)}，进货${Money.format(it.expenseCents)}" }
+        }) {
+            val inset = 5.dp.toPx()
+            val plotHeight = size.height - inset * 2
+            repeat(4) { i -> val y=inset+plotHeight*i/3f; drawLine(grid,Offset(inset,y),Offset(size.width-inset,y),1.dp.toPx()) }
+            fun drawSeries(color: Color, value: (Int) -> Long) {
+                val path = Path()
+                points.indices.forEach { i ->
+                    val x = if(points.size == 1) size.width/2 else inset+(size.width-inset*2)*i/(points.size-1)
+                    val fraction = (value(i).toDouble() - minValue.toDouble()) / (maxValue.toDouble() - minValue.toDouble())
+                    val y = inset+plotHeight*(1f-fraction.toFloat())
+                    if(i==0) path.moveTo(x,y) else path.lineTo(x,y)
+                    if(points.size <= 12 || i==0 || i==points.lastIndex) drawCircle(color,3.dp.toPx(),Offset(x,y))
+                }
+                drawPath(path,color,style=Stroke(2.dp.toPx(),cap=StrokeCap.Round))
+            }
+            drawSeries(revenue) { points[it].revenueCents }
+            drawSeries(expense) { points[it].expenseCents }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(points.first().label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if(points.size > 2) Text(points[points.size/2].label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if(points.size > 1) Text(points.last().label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
-
-private fun formatPercent(basisPoints: Int): String = "%.2f%%".format(basisPoints / 100.0)

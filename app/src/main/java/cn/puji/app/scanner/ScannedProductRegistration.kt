@@ -28,6 +28,7 @@ object ScannedProductRegistration {
             transactionQuantity = 1,
             completeTransactionOnSave = false,
         )
+        else -> throw IllegalArgumentException("请选择入货或出货")
     }
 
     fun transactionCart(

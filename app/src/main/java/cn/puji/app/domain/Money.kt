@@ -15,6 +15,6 @@ object Money {
     fun format(cents: Long): String = NumberFormat.getCurrencyInstance(Locale.CHINA).apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
-    }.format(cents / 100.0).replace("CN¥", "¥")
+    }.format(java.math.BigDecimal.valueOf(cents, 2)).replace("CN¥", "¥")
 }
 

@@ -26,6 +26,14 @@ class InventoryRepositoryTest {
         database = PujiDatabase(context)
         products = ProductRepository(database)
         inventory = InventoryRepository(database)
+        // Fixtures are explicit test data; fresh production databases remain empty.
+        listOf(
+            arrayOf<Any>("可口可乐 500ml","6901234567890","饮料",220,350,18,5,"",1,1,java.util.UUID.randomUUID().toString(),3960),
+            arrayOf<Any>("农夫山泉 550ml","6901234567891","饮料",100,200,4,6,"",1,1,java.util.UUID.randomUUID().toString(),400),
+            arrayOf<Any>("康师傅红烧牛肉面","6901234567892","食品",320,450,24,8,"",1,1,java.util.UUID.randomUUID().toString(),7680),
+        ).forEach { args -> database.writableDatabase.execSQL(
+            "INSERT INTO products(name,barcode,category,cost_price_cents,sale_price_cents,stock_quantity,low_stock_threshold,note,created_at,updated_at,uuid,stock_cost_cents) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",args,
+        ) }
     }
 
     @After fun tearDown() { database.close(); context.deleteDatabase("puji.db") }

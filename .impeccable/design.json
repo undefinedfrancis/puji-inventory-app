@@ -1,0 +1,990 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T07:29:19.519785+00:00",
+  "title": "Design System: 铺记 Android",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "克制蓝灰",
+        "tonalRamp": [
+          "oklch(15% 0.0505 224.69)",
+          "oklch(27% 0.0505 224.69)",
+          "oklch(39% 0.0505 224.69)",
+          "oklch(51% 0.0505 224.69)",
+          "oklch(63% 0.0505 224.69)",
+          "oklch(75% 0.0505 224.69)",
+          "oklch(87% 0.0505 224.69)",
+          "oklch(95% 0.0505 224.69)"
+        ]
+      },
+      "on-primary": {
+        "role": "primary",
+        "displayName": "主动作文字",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(27% 0.0000 89.88)",
+          "oklch(39% 0.0000 89.88)",
+          "oklch(51% 0.0000 89.88)",
+          "oklch(63% 0.0000 89.88)",
+          "oklch(75% 0.0000 89.88)",
+          "oklch(87% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "primary-container": {
+        "role": "primary",
+        "displayName": "淡蓝灰底",
+        "tonalRamp": [
+          "oklch(15% 0.0090 214.34)",
+          "oklch(27% 0.0090 214.34)",
+          "oklch(39% 0.0090 214.34)",
+          "oklch(51% 0.0090 214.34)",
+          "oklch(63% 0.0090 214.34)",
+          "oklch(75% 0.0090 214.34)",
+          "oklch(87% 0.0090 214.34)",
+          "oklch(95% 0.0090 214.34)"
+        ]
+      },
+      "on-primary-container": {
+        "role": "primary",
+        "displayName": "蓝灰容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.0505 224.69)",
+          "oklch(27% 0.0505 224.69)",
+          "oklch(39% 0.0505 224.69)",
+          "oklch(51% 0.0505 224.69)",
+          "oklch(63% 0.0505 224.69)",
+          "oklch(75% 0.0505 224.69)",
+          "oklch(87% 0.0505 224.69)",
+          "oklch(95% 0.0505 224.69)"
+        ]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "账目棕金",
+        "tonalRamp": [
+          "oklch(15% 0.0798 73.94)",
+          "oklch(27% 0.0798 73.94)",
+          "oklch(39% 0.0798 73.94)",
+          "oklch(51% 0.0798 73.94)",
+          "oklch(63% 0.0798 73.94)",
+          "oklch(75% 0.0798 73.94)",
+          "oklch(87% 0.0798 73.94)",
+          "oklch(95% 0.0798 73.94)"
+        ]
+      },
+      "on-secondary": {
+        "role": "secondary",
+        "displayName": "棕金上的文字",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(27% 0.0000 89.88)",
+          "oklch(39% 0.0000 89.88)",
+          "oklch(51% 0.0000 89.88)",
+          "oklch(63% 0.0000 89.88)",
+          "oklch(75% 0.0000 89.88)",
+          "oklch(87% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "secondary-container": {
+        "role": "secondary",
+        "displayName": "淡棕金底",
+        "tonalRamp": [
+          "oklch(15% 0.0315 84.59)",
+          "oklch(27% 0.0315 84.59)",
+          "oklch(39% 0.0315 84.59)",
+          "oklch(51% 0.0315 84.59)",
+          "oklch(63% 0.0315 84.59)",
+          "oklch(75% 0.0315 84.59)",
+          "oklch(87% 0.0315 84.59)",
+          "oklch(95% 0.0315 84.59)"
+        ]
+      },
+      "on-secondary-container": {
+        "role": "secondary",
+        "displayName": "棕金容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.0632 74.72)",
+          "oklch(27% 0.0632 74.72)",
+          "oklch(39% 0.0632 74.72)",
+          "oklch(51% 0.0632 74.72)",
+          "oklch(63% 0.0632 74.72)",
+          "oklch(75% 0.0632 74.72)",
+          "oklch(87% 0.0632 74.72)",
+          "oklch(95% 0.0632 74.72)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "米白纸底",
+        "tonalRamp": [
+          "oklch(15% 0.0127 86.83)",
+          "oklch(27% 0.0127 86.83)",
+          "oklch(39% 0.0127 86.83)",
+          "oklch(51% 0.0127 86.83)",
+          "oklch(63% 0.0127 86.83)",
+          "oklch(75% 0.0127 86.83)",
+          "oklch(87% 0.0127 86.83)",
+          "oklch(95% 0.0127 86.83)"
+        ]
+      },
+      "on-background": {
+        "role": "neutral",
+        "displayName": "页面墨色",
+        "tonalRamp": [
+          "oklch(15% 0.0056 156.87)",
+          "oklch(27% 0.0056 156.87)",
+          "oklch(39% 0.0056 156.87)",
+          "oklch(51% 0.0056 156.87)",
+          "oklch(63% 0.0056 156.87)",
+          "oklch(75% 0.0056 156.87)",
+          "oklch(87% 0.0056 156.87)",
+          "oklch(95% 0.0056 156.87)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "暖白面板",
+        "tonalRamp": [
+          "oklch(15% 0.0098 87.47)",
+          "oklch(27% 0.0098 87.47)",
+          "oklch(39% 0.0098 87.47)",
+          "oklch(51% 0.0098 87.47)",
+          "oklch(63% 0.0098 87.47)",
+          "oklch(75% 0.0098 87.47)",
+          "oklch(87% 0.0098 87.47)",
+          "oklch(95% 0.0098 87.47)"
+        ]
+      },
+      "on-surface": {
+        "role": "neutral",
+        "displayName": "面板墨色",
+        "tonalRamp": [
+          "oklch(15% 0.0056 156.87)",
+          "oklch(27% 0.0056 156.87)",
+          "oklch(39% 0.0056 156.87)",
+          "oklch(51% 0.0056 156.87)",
+          "oklch(63% 0.0056 156.87)",
+          "oklch(75% 0.0056 156.87)",
+          "oklch(87% 0.0056 156.87)",
+          "oklch(95% 0.0056 156.87)"
+        ]
+      },
+      "surface-container-lowest": {
+        "role": "neutral",
+        "displayName": "最低层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0098 87.47)",
+          "oklch(27% 0.0098 87.47)",
+          "oklch(39% 0.0098 87.47)",
+          "oklch(51% 0.0098 87.47)",
+          "oklch(63% 0.0098 87.47)",
+          "oklch(75% 0.0098 87.47)",
+          "oklch(87% 0.0098 87.47)",
+          "oklch(95% 0.0098 87.47)"
+        ]
+      },
+      "surface-container-low": {
+        "role": "neutral",
+        "displayName": "低层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0098 87.47)",
+          "oklch(27% 0.0098 87.47)",
+          "oklch(39% 0.0098 87.47)",
+          "oklch(51% 0.0098 87.47)",
+          "oklch(63% 0.0098 87.47)",
+          "oklch(75% 0.0098 87.47)",
+          "oklch(87% 0.0098 87.47)",
+          "oklch(95% 0.0098 87.47)"
+        ]
+      },
+      "surface-container": {
+        "role": "neutral",
+        "displayName": "常规容器",
+        "tonalRamp": [
+          "oklch(15% 0.0127 86.83)",
+          "oklch(27% 0.0127 86.83)",
+          "oklch(39% 0.0127 86.83)",
+          "oklch(51% 0.0127 86.83)",
+          "oklch(63% 0.0127 86.83)",
+          "oklch(75% 0.0127 86.83)",
+          "oklch(87% 0.0127 86.83)",
+          "oklch(95% 0.0127 86.83)"
+        ]
+      },
+      "surface-container-high": {
+        "role": "neutral",
+        "displayName": "高层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0098 87.47)",
+          "oklch(27% 0.0098 87.47)",
+          "oklch(39% 0.0098 87.47)",
+          "oklch(51% 0.0098 87.47)",
+          "oklch(63% 0.0098 87.47)",
+          "oklch(75% 0.0098 87.47)",
+          "oklch(87% 0.0098 87.47)",
+          "oklch(95% 0.0098 87.47)"
+        ]
+      },
+      "surface-container-highest": {
+        "role": "neutral",
+        "displayName": "最高层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0127 86.83)",
+          "oklch(27% 0.0127 86.83)",
+          "oklch(39% 0.0127 86.83)",
+          "oklch(51% 0.0127 86.83)",
+          "oklch(63% 0.0127 86.83)",
+          "oklch(75% 0.0127 86.83)",
+          "oklch(87% 0.0127 86.83)",
+          "oklch(95% 0.0127 86.83)"
+        ]
+      },
+      "surface-bright": {
+        "role": "neutral",
+        "displayName": "明亮表面",
+        "tonalRamp": [
+          "oklch(15% 0.0098 87.47)",
+          "oklch(27% 0.0098 87.47)",
+          "oklch(39% 0.0098 87.47)",
+          "oklch(51% 0.0098 87.47)",
+          "oklch(63% 0.0098 87.47)",
+          "oklch(75% 0.0098 87.47)",
+          "oklch(87% 0.0098 87.47)",
+          "oklch(95% 0.0098 87.47)"
+        ]
+      },
+      "surface-dim": {
+        "role": "neutral",
+        "displayName": "柔暗表面",
+        "tonalRamp": [
+          "oklch(15% 0.0149 80.71)",
+          "oklch(27% 0.0149 80.71)",
+          "oklch(39% 0.0149 80.71)",
+          "oklch(51% 0.0149 80.71)",
+          "oklch(63% 0.0149 80.71)",
+          "oklch(75% 0.0149 80.71)",
+          "oklch(87% 0.0149 80.71)",
+          "oklch(95% 0.0149 80.71)"
+        ]
+      },
+      "surface-tint": {
+        "role": "neutral",
+        "displayName": "表面色调",
+        "tonalRamp": [
+          "oklch(15% 0.0505 224.69)",
+          "oklch(27% 0.0505 224.69)",
+          "oklch(39% 0.0505 224.69)",
+          "oklch(51% 0.0505 224.69)",
+          "oklch(63% 0.0505 224.69)",
+          "oklch(75% 0.0505 224.69)",
+          "oklch(87% 0.0505 224.69)",
+          "oklch(95% 0.0505 224.69)"
+        ]
+      },
+      "surface-variant": {
+        "role": "neutral",
+        "displayName": "变体面板",
+        "tonalRamp": [
+          "oklch(15% 0.0144 84.58)",
+          "oklch(27% 0.0144 84.58)",
+          "oklch(39% 0.0144 84.58)",
+          "oklch(51% 0.0144 84.58)",
+          "oklch(63% 0.0144 84.58)",
+          "oklch(75% 0.0144 84.58)",
+          "oklch(87% 0.0144 84.58)",
+          "oklch(95% 0.0144 84.58)"
+        ]
+      },
+      "on-surface-variant": {
+        "role": "neutral",
+        "displayName": "辅助灰",
+        "tonalRamp": [
+          "oklch(15% 0.0077 115.84)",
+          "oklch(27% 0.0077 115.84)",
+          "oklch(39% 0.0077 115.84)",
+          "oklch(51% 0.0077 115.84)",
+          "oklch(63% 0.0077 115.84)",
+          "oklch(75% 0.0077 115.84)",
+          "oklch(87% 0.0077 115.84)",
+          "oklch(95% 0.0077 115.84)"
+        ]
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "输入边界",
+        "tonalRamp": [
+          "oklch(15% 0.0118 112.51)",
+          "oklch(27% 0.0118 112.51)",
+          "oklch(39% 0.0118 112.51)",
+          "oklch(51% 0.0118 112.51)",
+          "oklch(63% 0.0118 112.51)",
+          "oklch(75% 0.0118 112.51)",
+          "oklch(87% 0.0118 112.51)",
+          "oklch(95% 0.0118 112.51)"
+        ]
+      },
+      "outline-variant": {
+        "role": "neutral",
+        "displayName": "细分隔线",
+        "tonalRamp": [
+          "oklch(15% 0.0145 84.59)",
+          "oklch(27% 0.0145 84.59)",
+          "oklch(39% 0.0145 84.59)",
+          "oklch(51% 0.0145 84.59)",
+          "oklch(63% 0.0145 84.59)",
+          "oklch(75% 0.0145 84.59)",
+          "oklch(87% 0.0145 84.59)",
+          "oklch(95% 0.0145 84.59)"
+        ]
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "温红错误",
+        "tonalRamp": [
+          "oklch(15% 0.1446 27.06)",
+          "oklch(27% 0.1446 27.06)",
+          "oklch(39% 0.1446 27.06)",
+          "oklch(51% 0.1446 27.06)",
+          "oklch(63% 0.1446 27.06)",
+          "oklch(75% 0.1446 27.06)",
+          "oklch(87% 0.1446 27.06)",
+          "oklch(95% 0.1446 27.06)"
+        ]
+      },
+      "error-container": {
+        "role": "neutral",
+        "displayName": "淡红错误底",
+        "tonalRamp": [
+          "oklch(15% 0.0178 39.40)",
+          "oklch(27% 0.0178 39.40)",
+          "oklch(39% 0.0178 39.40)",
+          "oklch(51% 0.0178 39.40)",
+          "oklch(63% 0.0178 39.40)",
+          "oklch(75% 0.0178 39.40)",
+          "oklch(87% 0.0178 39.40)",
+          "oklch(95% 0.0178 39.40)"
+        ]
+      },
+      "on-error-container": {
+        "role": "neutral",
+        "displayName": "错误容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.1289 26.91)",
+          "oklch(27% 0.1289 26.91)",
+          "oklch(39% 0.1289 26.91)",
+          "oklch(51% 0.1289 26.91)",
+          "oklch(63% 0.1289 26.91)",
+          "oklch(75% 0.1289 26.91)",
+          "oklch(87% 0.1289 26.91)",
+          "oklch(95% 0.1289 26.91)"
+        ]
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "深色 · 克制蓝灰",
+        "tonalRamp": [
+          "oklch(15% 0.0483 222.21)",
+          "oklch(27% 0.0483 222.21)",
+          "oklch(39% 0.0483 222.21)",
+          "oklch(51% 0.0483 222.21)",
+          "oklch(63% 0.0483 222.21)",
+          "oklch(75% 0.0483 222.21)",
+          "oklch(87% 0.0483 222.21)",
+          "oklch(95% 0.0483 222.21)"
+        ]
+      },
+      "dark-on-primary": {
+        "role": "primary",
+        "displayName": "深色 · 主动作文字",
+        "tonalRamp": [
+          "oklch(15% 0.0469 224.58)",
+          "oklch(27% 0.0469 224.58)",
+          "oklch(39% 0.0469 224.58)",
+          "oklch(51% 0.0469 224.58)",
+          "oklch(63% 0.0469 224.58)",
+          "oklch(75% 0.0469 224.58)",
+          "oklch(87% 0.0469 224.58)",
+          "oklch(95% 0.0469 224.58)"
+        ]
+      },
+      "dark-primary-container": {
+        "role": "primary",
+        "displayName": "深色 · 淡蓝灰底",
+        "tonalRamp": [
+          "oklch(15% 0.0453 224.73)",
+          "oklch(27% 0.0453 224.73)",
+          "oklch(39% 0.0453 224.73)",
+          "oklch(51% 0.0453 224.73)",
+          "oklch(63% 0.0453 224.73)",
+          "oklch(75% 0.0453 224.73)",
+          "oklch(87% 0.0453 224.73)",
+          "oklch(95% 0.0453 224.73)"
+        ]
+      },
+      "dark-on-primary-container": {
+        "role": "primary",
+        "displayName": "深色 · 蓝灰容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.0258 221.59)",
+          "oklch(27% 0.0258 221.59)",
+          "oklch(39% 0.0258 221.59)",
+          "oklch(51% 0.0258 221.59)",
+          "oklch(63% 0.0258 221.59)",
+          "oklch(75% 0.0258 221.59)",
+          "oklch(87% 0.0258 221.59)",
+          "oklch(95% 0.0258 221.59)"
+        ]
+      },
+      "dark-secondary": {
+        "role": "secondary",
+        "displayName": "深色 · 账目棕金",
+        "tonalRamp": [
+          "oklch(15% 0.0769 81.48)",
+          "oklch(27% 0.0769 81.48)",
+          "oklch(39% 0.0769 81.48)",
+          "oklch(51% 0.0769 81.48)",
+          "oklch(63% 0.0769 81.48)",
+          "oklch(75% 0.0769 81.48)",
+          "oklch(87% 0.0769 81.48)",
+          "oklch(95% 0.0769 81.48)"
+        ]
+      },
+      "dark-on-secondary": {
+        "role": "secondary",
+        "displayName": "深色 · 棕金上的文字",
+        "tonalRamp": [
+          "oklch(15% 0.0452 77.02)",
+          "oklch(27% 0.0452 77.02)",
+          "oklch(39% 0.0452 77.02)",
+          "oklch(51% 0.0452 77.02)",
+          "oklch(63% 0.0452 77.02)",
+          "oklch(75% 0.0452 77.02)",
+          "oklch(87% 0.0452 77.02)",
+          "oklch(95% 0.0452 77.02)"
+        ]
+      },
+      "dark-secondary-container": {
+        "role": "secondary",
+        "displayName": "深色 · 淡棕金底",
+        "tonalRamp": [
+          "oklch(15% 0.0394 78.50)",
+          "oklch(27% 0.0394 78.50)",
+          "oklch(39% 0.0394 78.50)",
+          "oklch(51% 0.0394 78.50)",
+          "oklch(63% 0.0394 78.50)",
+          "oklch(75% 0.0394 78.50)",
+          "oklch(87% 0.0394 78.50)",
+          "oklch(95% 0.0394 78.50)"
+        ]
+      },
+      "dark-on-secondary-container": {
+        "role": "secondary",
+        "displayName": "深色 · 棕金容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.0549 82.36)",
+          "oklch(27% 0.0549 82.36)",
+          "oklch(39% 0.0549 82.36)",
+          "oklch(51% 0.0549 82.36)",
+          "oklch(63% 0.0549 82.36)",
+          "oklch(75% 0.0549 82.36)",
+          "oklch(87% 0.0549 82.36)",
+          "oklch(95% 0.0549 82.36)"
+        ]
+      },
+      "dark-background": {
+        "role": "neutral",
+        "displayName": "深色 · 米白纸底",
+        "tonalRamp": [
+          "oklch(15% 0.0048 145.42)",
+          "oklch(27% 0.0048 145.42)",
+          "oklch(39% 0.0048 145.42)",
+          "oklch(51% 0.0048 145.42)",
+          "oklch(63% 0.0048 145.42)",
+          "oklch(75% 0.0048 145.42)",
+          "oklch(87% 0.0048 145.42)",
+          "oklch(95% 0.0048 145.42)"
+        ]
+      },
+      "dark-on-background": {
+        "role": "neutral",
+        "displayName": "深色 · 页面墨色",
+        "tonalRamp": [
+          "oklch(15% 0.0144 84.58)",
+          "oklch(27% 0.0144 84.58)",
+          "oklch(39% 0.0144 84.58)",
+          "oklch(51% 0.0144 84.58)",
+          "oklch(63% 0.0144 84.58)",
+          "oklch(75% 0.0144 84.58)",
+          "oklch(87% 0.0144 84.58)",
+          "oklch(95% 0.0144 84.58)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "深色 · 暖白面板",
+        "tonalRamp": [
+          "oklch(15% 0.0069 145.39)",
+          "oklch(27% 0.0069 145.39)",
+          "oklch(39% 0.0069 145.39)",
+          "oklch(51% 0.0069 145.39)",
+          "oklch(63% 0.0069 145.39)",
+          "oklch(75% 0.0069 145.39)",
+          "oklch(87% 0.0069 145.39)",
+          "oklch(95% 0.0069 145.39)"
+        ]
+      },
+      "dark-on-surface": {
+        "role": "neutral",
+        "displayName": "深色 · 面板墨色",
+        "tonalRamp": [
+          "oklch(15% 0.0144 84.58)",
+          "oklch(27% 0.0144 84.58)",
+          "oklch(39% 0.0144 84.58)",
+          "oklch(51% 0.0144 84.58)",
+          "oklch(63% 0.0144 84.58)",
+          "oklch(75% 0.0144 84.58)",
+          "oklch(87% 0.0144 84.58)",
+          "oklch(95% 0.0144 84.58)"
+        ]
+      },
+      "dark-surface-container-lowest": {
+        "role": "neutral",
+        "displayName": "深色 · 最低层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0073 145.32)",
+          "oklch(27% 0.0073 145.32)",
+          "oklch(39% 0.0073 145.32)",
+          "oklch(51% 0.0073 145.32)",
+          "oklch(63% 0.0073 145.32)",
+          "oklch(75% 0.0073 145.32)",
+          "oklch(87% 0.0073 145.32)",
+          "oklch(95% 0.0073 145.32)"
+        ]
+      },
+      "dark-surface-container-low": {
+        "role": "neutral",
+        "displayName": "深色 · 低层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0070 145.37)",
+          "oklch(27% 0.0070 145.37)",
+          "oklch(39% 0.0070 145.37)",
+          "oklch(51% 0.0070 145.37)",
+          "oklch(63% 0.0070 145.37)",
+          "oklch(75% 0.0070 145.37)",
+          "oklch(87% 0.0070 145.37)",
+          "oklch(95% 0.0070 145.37)"
+        ]
+      },
+      "dark-surface-container": {
+        "role": "neutral",
+        "displayName": "深色 · 常规容器",
+        "tonalRamp": [
+          "oklch(15% 0.0069 145.39)",
+          "oklch(27% 0.0069 145.39)",
+          "oklch(39% 0.0069 145.39)",
+          "oklch(51% 0.0069 145.39)",
+          "oklch(63% 0.0069 145.39)",
+          "oklch(75% 0.0069 145.39)",
+          "oklch(87% 0.0069 145.39)",
+          "oklch(95% 0.0069 145.39)"
+        ]
+      },
+      "dark-surface-container-high": {
+        "role": "neutral",
+        "displayName": "深色 · 高层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0081 137.81)",
+          "oklch(27% 0.0081 137.81)",
+          "oklch(39% 0.0081 137.81)",
+          "oklch(51% 0.0081 137.81)",
+          "oklch(63% 0.0081 137.81)",
+          "oklch(75% 0.0081 137.81)",
+          "oklch(87% 0.0081 137.81)",
+          "oklch(95% 0.0081 137.81)"
+        ]
+      },
+      "dark-surface-container-highest": {
+        "role": "neutral",
+        "displayName": "深色 · 最高层容器",
+        "tonalRamp": [
+          "oklch(15% 0.0115 134.99)",
+          "oklch(27% 0.0115 134.99)",
+          "oklch(39% 0.0115 134.99)",
+          "oklch(51% 0.0115 134.99)",
+          "oklch(63% 0.0115 134.99)",
+          "oklch(75% 0.0115 134.99)",
+          "oklch(87% 0.0115 134.99)",
+          "oklch(95% 0.0115 134.99)"
+        ]
+      },
+      "dark-surface-bright": {
+        "role": "neutral",
+        "displayName": "深色 · 明亮表面",
+        "tonalRamp": [
+          "oklch(15% 0.0115 134.99)",
+          "oklch(27% 0.0115 134.99)",
+          "oklch(39% 0.0115 134.99)",
+          "oklch(51% 0.0115 134.99)",
+          "oklch(63% 0.0115 134.99)",
+          "oklch(75% 0.0115 134.99)",
+          "oklch(87% 0.0115 134.99)",
+          "oklch(95% 0.0115 134.99)"
+        ]
+      },
+      "dark-surface-dim": {
+        "role": "neutral",
+        "displayName": "深色 · 柔暗表面",
+        "tonalRamp": [
+          "oklch(15% 0.0073 145.32)",
+          "oklch(27% 0.0073 145.32)",
+          "oklch(39% 0.0073 145.32)",
+          "oklch(51% 0.0073 145.32)",
+          "oklch(63% 0.0073 145.32)",
+          "oklch(75% 0.0073 145.32)",
+          "oklch(87% 0.0073 145.32)",
+          "oklch(95% 0.0073 145.32)"
+        ]
+      },
+      "dark-surface-tint": {
+        "role": "neutral",
+        "displayName": "深色 · 表面色调",
+        "tonalRamp": [
+          "oklch(15% 0.0483 222.21)",
+          "oklch(27% 0.0483 222.21)",
+          "oklch(39% 0.0483 222.21)",
+          "oklch(51% 0.0483 222.21)",
+          "oklch(63% 0.0483 222.21)",
+          "oklch(75% 0.0483 222.21)",
+          "oklch(87% 0.0483 222.21)",
+          "oklch(95% 0.0483 222.21)"
+        ]
+      },
+      "dark-surface-variant": {
+        "role": "neutral",
+        "displayName": "深色 · 变体面板",
+        "tonalRamp": [
+          "oklch(15% 0.0111 128.84)",
+          "oklch(27% 0.0111 128.84)",
+          "oklch(39% 0.0111 128.84)",
+          "oklch(51% 0.0111 128.84)",
+          "oklch(63% 0.0111 128.84)",
+          "oklch(75% 0.0111 128.84)",
+          "oklch(87% 0.0111 128.84)",
+          "oklch(95% 0.0111 128.84)"
+        ]
+      },
+      "dark-on-surface-variant": {
+        "role": "neutral",
+        "displayName": "深色 · 辅助灰",
+        "tonalRamp": [
+          "oklch(15% 0.0125 111.82)",
+          "oklch(27% 0.0125 111.82)",
+          "oklch(39% 0.0125 111.82)",
+          "oklch(51% 0.0125 111.82)",
+          "oklch(63% 0.0125 111.82)",
+          "oklch(75% 0.0125 111.82)",
+          "oklch(87% 0.0125 111.82)",
+          "oklch(95% 0.0125 111.82)"
+        ]
+      },
+      "dark-outline": {
+        "role": "neutral",
+        "displayName": "深色 · 输入边界",
+        "tonalRamp": [
+          "oklch(15% 0.0150 120.43)",
+          "oklch(27% 0.0150 120.43)",
+          "oklch(39% 0.0150 120.43)",
+          "oklch(51% 0.0150 120.43)",
+          "oklch(63% 0.0150 120.43)",
+          "oklch(75% 0.0150 120.43)",
+          "oklch(87% 0.0150 120.43)",
+          "oklch(95% 0.0150 120.43)"
+        ]
+      },
+      "dark-outline-variant": {
+        "role": "neutral",
+        "displayName": "深色 · 细分隔线",
+        "tonalRamp": [
+          "oklch(15% 0.0123 125.98)",
+          "oklch(27% 0.0123 125.98)",
+          "oklch(39% 0.0123 125.98)",
+          "oklch(51% 0.0123 125.98)",
+          "oklch(63% 0.0123 125.98)",
+          "oklch(75% 0.0123 125.98)",
+          "oklch(87% 0.0123 125.98)",
+          "oklch(95% 0.0123 125.98)"
+        ]
+      },
+      "dark-error": {
+        "role": "neutral",
+        "displayName": "深色 · 温红错误",
+        "tonalRamp": [
+          "oklch(15% 0.0896 28.41)",
+          "oklch(27% 0.0896 28.41)",
+          "oklch(39% 0.0896 28.41)",
+          "oklch(51% 0.0896 28.41)",
+          "oklch(63% 0.0896 28.41)",
+          "oklch(75% 0.0896 28.41)",
+          "oklch(87% 0.0896 28.41)",
+          "oklch(95% 0.0896 28.41)"
+        ]
+      },
+      "dark-error-container": {
+        "role": "neutral",
+        "displayName": "深色 · 淡红错误底",
+        "tonalRamp": [
+          "oklch(15% 0.0723 26.08)",
+          "oklch(27% 0.0723 26.08)",
+          "oklch(39% 0.0723 26.08)",
+          "oklch(51% 0.0723 26.08)",
+          "oklch(63% 0.0723 26.08)",
+          "oklch(75% 0.0723 26.08)",
+          "oklch(87% 0.0723 26.08)",
+          "oklch(95% 0.0723 26.08)"
+        ]
+      },
+      "dark-on-error-container": {
+        "role": "neutral",
+        "displayName": "深色 · 错误容器文字",
+        "tonalRamp": [
+          "oklch(15% 0.0422 28.78)",
+          "oklch(27% 0.0422 28.78)",
+          "oklch(39% 0.0422 28.78)",
+          "oklch(51% 0.0422 28.78)",
+          "oklch(63% 0.0422 28.78)",
+          "oklch(75% 0.0422 28.78)",
+          "oklch(87% 0.0422 28.78)",
+          "oklch(95% 0.0422 28.78)"
+        ]
+      },
+      "icon-apricot": {
+        "role": "neutral",
+        "displayName": "图标杏色底",
+        "tonalRamp": [
+          "oklch(15% 0.0350 70.15)",
+          "oklch(27% 0.0350 70.15)",
+          "oklch(39% 0.0350 70.15)",
+          "oklch(51% 0.0350 70.15)",
+          "oklch(63% 0.0350 70.15)",
+          "oklch(75% 0.0350 70.15)",
+          "oklch(87% 0.0350 70.15)",
+          "oklch(95% 0.0350 70.15)"
+        ]
+      },
+      "icon-paper": {
+        "role": "neutral",
+        "displayName": "图标奶油店身",
+        "tonalRamp": [
+          "oklch(15% 0.0211 85.94)",
+          "oklch(27% 0.0211 85.94)",
+          "oklch(39% 0.0211 85.94)",
+          "oklch(51% 0.0211 85.94)",
+          "oklch(63% 0.0211 85.94)",
+          "oklch(75% 0.0211 85.94)",
+          "oklch(87% 0.0211 85.94)",
+          "oklch(95% 0.0211 85.94)"
+        ]
+      },
+      "icon-terracotta": {
+        "role": "neutral",
+        "displayName": "图标陶土雨棚",
+        "tonalRamp": [
+          "oklch(15% 0.1167 38.34)",
+          "oklch(27% 0.1167 38.34)",
+          "oklch(39% 0.1167 38.34)",
+          "oklch(51% 0.1167 38.34)",
+          "oklch(63% 0.1167 38.34)",
+          "oklch(75% 0.1167 38.34)",
+          "oklch(87% 0.1167 38.34)",
+          "oklch(95% 0.1167 38.34)"
+        ]
+      },
+      "icon-olive": {
+        "role": "neutral",
+        "displayName": "图标橄榄门",
+        "tonalRamp": [
+          "oklch(15% 0.0466 121.62)",
+          "oklch(27% 0.0466 121.62)",
+          "oklch(39% 0.0466 121.62)",
+          "oklch(51% 0.0466 121.62)",
+          "oklch(63% 0.0466 121.62)",
+          "oklch(75% 0.0466 121.62)",
+          "oklch(87% 0.0466 121.62)",
+          "oklch(95% 0.0466 121.62)"
+        ]
+      },
+      "icon-window": {
+        "role": "neutral",
+        "displayName": "图标赭色窗",
+        "tonalRamp": [
+          "oklch(15% 0.0895 75.30)",
+          "oklch(27% 0.0895 75.30)",
+          "oklch(39% 0.0895 75.30)",
+          "oklch(51% 0.0895 75.30)",
+          "oklch(63% 0.0895 75.30)",
+          "oklch(75% 0.0895 75.30)",
+          "oklch(87% 0.0895 75.30)",
+          "oklch(95% 0.0895 75.30)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "display",
+        "purpose": "主要金额；仅 prominent 首项。"
+      },
+      "headline": {
+        "displayName": "headline",
+        "purpose": "页标题。"
+      },
+      "headline-small": {
+        "displayName": "headline-small",
+        "purpose": "指标与次级金额。"
+      },
+      "title": {
+        "displayName": "title",
+        "purpose": "行标题和分组标题。"
+      },
+      "body": {
+        "displayName": "body",
+        "purpose": "主要正文。"
+      },
+      "body-small": {
+        "displayName": "body-small",
+        "purpose": "日期、类别和补充信息。"
+      },
+      "label-large": {
+        "displayName": "label-large",
+        "purpose": "操作按钮。"
+      },
+      "label-medium": {
+        "displayName": "label-medium",
+        "purpose": "状态标签及刻度。"
+      },
+      "label-small": {
+        "displayName": "label-small",
+        "purpose": "底部导航。"
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "主要操作",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "documentationOnly: 状态依赖 Material 3；文档 CSS 仅显示聚焦、悬停和按压；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<button class=\"ds-button-primary\">确认出货</button>",
+      "css": ".ds-button-primary{font-family:sans-serif;font-variant-numeric:tabular-nums;min-height:48px;padding:10px 24px;border:none;border-radius:12px;background:#365D6C;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer} .ds-button-primary:hover{filter:brightness(.96)} .ds-button-primary:focus-visible{outline:2px solid #365D6C;outline-offset:3px} .ds-button-primary:active{filter:brightness(.90)} .ds-button-primary:disabled{opacity:.38;cursor:default}"
+    },
+    {
+      "name": "次要描边操作",
+      "kind": "button",
+      "refersTo": "button-outlined",
+      "description": "documentationOnly: 状态依赖 Material 3；文档 CSS 仅显示聚焦、悬停和按压；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<button class=\"ds-button-outlined\">入货</button>",
+      "css": ".ds-button-outlined{font-family:sans-serif;font-variant-numeric:tabular-nums;min-height:56px;padding:10px 24px;border:1px solid #8B8C84;border-radius:12px;background:transparent;color:#365D6C;font-size:14px;font-weight:500;cursor:pointer} .ds-button-outlined:hover{filter:brightness(.96)} .ds-button-outlined:focus-visible{outline:2px solid #365D6C;outline-offset:3px} .ds-button-outlined:active{filter:brightness(.90)} .ds-button-outlined:disabled{opacity:.38;cursor:default}"
+    },
+    {
+      "name": "已选筛选",
+      "kind": "button",
+      "refersTo": "choice-selected",
+      "description": "documentationOnly: 状态依赖 Material 3；文档 CSS 仅显示聚焦、悬停和按压；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<button class=\"ds-choice-selected\">全部</button>",
+      "css": ".ds-choice-selected{font-family:sans-serif;font-variant-numeric:tabular-nums;min-height:48px;padding:10px 24px;border:none;border-radius:12px;background:#E4ECEE;color:#365D6C;font-size:14px;font-weight:500;cursor:pointer} .ds-choice-selected:hover{filter:brightness(.96)} .ds-choice-selected:focus-visible{outline:2px solid #365D6C;outline-offset:3px} .ds-choice-selected:active{filter:brightness(.90)} .ds-choice-selected:disabled{opacity:.38;cursor:default}"
+    },
+    {
+      "name": "未选筛选",
+      "kind": "button",
+      "refersTo": "choice-unselected",
+      "description": "documentationOnly: 状态依赖 Material 3；文档 CSS 仅显示聚焦、悬停和按压；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<button class=\"ds-choice-unselected\">低库存</button>",
+      "css": ".ds-choice-unselected{font-family:sans-serif;font-variant-numeric:tabular-nums;min-height:48px;padding:10px 24px;border:none;border-radius:12px;background:transparent;color:#6D6E69;font-size:14px;font-weight:500;cursor:pointer} .ds-choice-unselected:hover{filter:brightness(.96)} .ds-choice-unselected:focus-visible{outline:2px solid #365D6C;outline-offset:3px} .ds-choice-unselected:active{filter:brightness(.90)} .ds-choice-unselected:disabled{opacity:.38;cursor:default}"
+    },
+    {
+      "name": "搜索字段",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "documentationOnly: 商品搜索的主题与圆角；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<label class=\"ds-search-label\">搜索商品<input class=\"ds-search\" placeholder=\"商品名称或条码\" /></label>",
+      "css": ".ds-search-label{font-family:sans-serif;font-variant-numeric:tabular-nums;display:block;color:#6D6E69;font-size:12px} .ds-search{font-family:sans-serif;font-variant-numeric:tabular-nums;display:block;width:240px;max-width:100%;min-height:48px;border:1px solid #8B8C84;border-radius:12px;background:transparent;color:#292C2A;font-size:15px;padding:0 12px} .ds-search:hover{border-color:#292C2A} .ds-search:focus-visible{outline:2px solid #365D6C;outline-offset:0}"
+    },
+    {
+      "name": "账目卡片",
+      "kind": "card",
+      "refersTo": "receipt-card",
+      "description": "documentationOnly: 无自定义投影的内容分组；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<article class=\"ds-card\"><span class=\"ds-card-label\">今日销售</span><strong class=\"ds-card-amount\">¥1,286.00</strong></article>",
+      "css": ".ds-card{font-family:sans-serif;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:#FFFCF5;color:#292C2A} .ds-card-label{font-size:13px;line-height:18px;color:#6D6E69} .ds-card-amount{font-size:26px;line-height:32px;font-weight:500}"
+    },
+    {
+      "name": "普通状态",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "documentationOnly: 非交互展示标签；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<span class=\"ds-status\">已停用</span>",
+      "css": ".ds-status{font-family:sans-serif;font-variant-numeric:tabular-nums;display:inline-block;padding:4px 8px;border-radius:8px;background:#E4ECEE;color:#365D6C;font-size:12px;line-height:18px}"
+    },
+    {
+      "name": "警告状态",
+      "kind": "chip",
+      "refersTo": "status-warning",
+      "description": "documentationOnly: 非交互警告标签；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<span class=\"ds-warning\">低库存</span>",
+      "css": ".ds-warning{font-family:sans-serif;font-variant-numeric:tabular-nums;display:inline-block;padding:4px 8px;border-radius:8px;background:#F6E7E2;color:#8A2C27;font-size:12px;line-height:18px}"
+    },
+    {
+      "name": "四项底部导航",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "documentationOnly: 紧凑手机导航；按钮不会真的切换应用页面；Compose 原生组件的浅色静态映射，不是生产代码或设备截图。",
+      "html": "<nav class=\"ds-nav\" aria-label=\"主导航\"><button class=\"ds-nav-item\" aria-current=\"page\"><span class=\"ds-nav-icon\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 11 12 3 21 11M5 10v11h5v-6h4v6h5V10\"/></svg></span>今日</button><button class=\"ds-nav-item\"><span class=\"ds-nav-icon\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"6\" width=\"14\" height=\"15\" rx=\"2\"/><path d=\"M9 7V4h6v3M9 11v.2M15 11v.2\"/></svg></span>商品</button><button class=\"ds-nav-item\"><span class=\"ds-nav-icon\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9V4h5m6 0h5v5M4 15v5h5m6 0h5v-5M3 12h18\"/></svg></span>扫码</button><button class=\"ds-nav-item\"><span class=\"ds-nav-icon\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 21v-8m7 8V4m7 17V9\"/></svg></span>经营</button></nav>",
+      "css": ".ds-nav{font-family:sans-serif;font-variant-numeric:tabular-nums;display:flex;gap:4px;padding:12px;background:#FFFCF5} .ds-nav-item{font-family:sans-serif;font-variant-numeric:tabular-nums;flex:1;min-width:48px;min-height:48px;display:flex;align-items:center;flex-direction:column;gap:4px;border:0;background:transparent;color:#6D6E69;font-size:11px;line-height:16px;font-weight:500;cursor:pointer} .ds-nav-icon{display:flex;justify-content:center;width:56px;padding:4px;border-radius:16px} .ds-nav-item[aria-current=\"page\"] .ds-nav-icon{background:#E4ECEE;color:#365D6C} .ds-nav-item:hover{background:#F6F2E9} .ds-nav-item:focus-visible{outline:2px solid #365D6C;outline-offset:2px} .ds-nav-item:active{filter:brightness(.9)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "米白小店账页",
+    "overview": "用户已确认米白背景、小字号、轻字重和简洁直接的方向。界面像一页清楚整理的小店账目，以商品、数量、金额和操作为中心；不把纸张隐喻做成做旧纹理或装饰。此命名仅概括已确认的方向，不引入新的品牌选择。\n\n本记录从 Android Compose 源码提取，适用于铺记的公共主题和组件。设计参考为 `docs/design/2026-10-31-cream/ui-cream-typography-v2.png`；它不是设备截图。记录日期为 2026-10-31。已在独立 Android 16（API 36.1） 模拟器检查真实运行的浅/深色、375dp窄屏、1.3倍字体、长名称和大金额，截图位于 docs/screenshots/2.0/；底部软键盘展开时已验证表单可滚动至保存和取消，实体手机相机尚未实测。",
+    "keyCharacteristics": [
+      "米白底与暖白面板，低饱和蓝灰只强调操作。",
+      "正文克制，主要金额与页标题建立清晰层级。",
+      "使用原生 Material 3 结构与交互，品牌通过主题表达。",
+      "小店图标使用独立的杏色、陶土和橄榄色片拼接。"
+    ],
+    "rules": [
+      {
+        "name": "米白底色",
+        "body": "浅色界面以 background 与 surface 为主体；primary 用于动作、选中态和数据系列，不铺成整屏钴蓝。",
+        "section": "colors"
+      },
+      {
+        "name": "字号分工",
+        "body": "正文使用 body，页面标题使用 headlineMedium，最重要金额才使用 displaySmall；不要把所有数字都放大或加粗。",
+        "section": "typography"
+      },
+      {
+        "name": "语义深度",
+        "body": "深色模式使用 DarkColors 中显式定义的 surfaceContainer 层级；组件从 MaterialTheme.colorScheme 取色。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do 使用米白背景、暖白面板及语义主题色，新增界面沿用现有角色。",
+      "Do 使用 sp 文字和 dp 布局，保持至少 48dp 的点击区域。",
+      "Do 保留金额的等宽数字特性，并让长金额及大字体场景换行或纵向排列。",
+      "Do 用文字、图形和可访问描述共同表达状态，错误不能只靠变红。",
+      "Do 将图标的独立配色留在品牌资产中，并使用适配图标与单色图标资源。"
+    ],
+    "donts": [
+      "Don't 恢复被用户否决的钴蓝主界面、蓝白大字号重字重版本或深蓝扫描框启动图标。",
+      "Don't 把用户图标参考中的爱心、星芒、翅膀或灰蓝配色照搬成新品牌。",
+      "Don't 因为参考预览看起来完整，就宣称 Compose 页面通过了设备、深色或字体 QA。",
+      "Don't 把文档面板的 HTML/CSS 映射当作可直接用于 Compose 的生产组件。"
+    ]
+  }
+}

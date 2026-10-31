@@ -13,11 +13,16 @@ data class Product(
     val active: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
+    val uuid: String = "",
+    val stockCostCents: Long = 0,
+    val version: Long = 1,
+    val source: String = "local",
+    val costSource: String = "actual",
 ) {
     val isLowStock: Boolean get() = active && stockQuantity <= lowStockThreshold
 }
 
-enum class DocumentType { INBOUND, OUTBOUND }
+enum class DocumentType { INBOUND, OUTBOUND, OPENING, SALES_RETURN, PURCHASE_RETURN, STOCK_GAIN, STOCK_LOSS, WRITE_OFF, REVERSAL }
 
 data class StockDocument(
     val id: Long,
@@ -26,6 +31,14 @@ data class StockDocument(
     val note: String,
     val createdAt: Long,
     val lines: List<DocumentLine> = emptyList(),
+    val uuid: String = "",
+    val requestId: String = "",
+    val originalDocumentId: Long? = null,
+    val originalType: DocumentType? = null,
+    val valuationDifferenceCents: Long = 0,
+    val costSource: String = "actual",
+    val expectedQuantity: Int? = null,
+    val actualQuantity: Int? = null,
 )
 
 data class DocumentLine(
@@ -37,11 +50,32 @@ data class DocumentLine(
     val unitPriceCents: Long,
     val costPriceSnapshotCents: Long = 0,
     val quantity: Int,
+    val lineCostCents: Long = Math.multiplyExact(costPriceSnapshotCents, quantity.toLong()),
+    val stockCostDeltaCents: Long = 0,
+    val quantityDelta: Int = 0,
+    val originalLineId: Long? = null,
+    val valuationDifferenceCents: Long = 0,
+    val costSource: String = "actual",
+    val uuid: String = "",
+    val returnedQuantity: Int = 0,
+    val returnedCostCents: Long = 0,
 ) {
-    val lineTotalCents: Long get() = unitPriceCents * quantity
-    val costTotalCents: Long get() = costPriceSnapshotCents * quantity
-    val grossProfitCents: Long get() = lineTotalCents - costTotalCents
+    val lineTotalCents: Long get() = Math.multiplyExact(unitPriceCents, quantity.toLong())
+    val costTotalCents: Long get() = lineCostCents
+    val grossProfitCents: Long get() = Math.subtractExact(lineTotalCents, costTotalCents)
 }
+
+data class StockHistoryEntry(
+    val id: Long,
+    val documentId: Long,
+    val type: DocumentType,
+    val quantityDelta: Int,
+    val stockAfter: Int,
+    val stockCostDeltaCents: Long,
+    val stockCostAfterCents: Long,
+    val createdAt: Long,
+    val note: String,
+)
 
 data class DashboardStats(
     val todaySalesCents: Long = 0,
@@ -49,4 +83,5 @@ data class DashboardStats(
     val productCount: Int = 0,
     val lowStockCount: Int = 0,
     val inventoryValueCents: Long = 0,
+    val todayGrossProfitCents: Long = 0,
 )

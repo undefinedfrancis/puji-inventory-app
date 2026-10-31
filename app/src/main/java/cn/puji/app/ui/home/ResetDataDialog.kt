@@ -48,11 +48,12 @@ fun ResetDataDialog(
         text = {
             Column {
                 Text("此操作不可撤销，将同时清除：")
-                Text("\n• 全部商品资料和库存\n• 全部入货流水\n• 全部出货流水\n• 当前未提交的扫码单")
+                Text("\n• 全部商品资料和库存\n• 全部交易与库存调整记录\n• 未提交清单和本机回退副本")
+                Text("\n可先在设置中保存完整备份。已导出的文件不受影响。", style = MaterialTheme.typography.bodySmall)
                 Text(
                     "\n请按住下方红色按钮 2 秒。",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                 )
             }
         },
@@ -113,7 +114,7 @@ private fun HoldToResetButton(
             if (working) {
                 CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.height(22.dp))
             } else {
-                Text(if (holding) "继续按住… ${(progress * 100).toInt()}%" else "按住 2 秒永久清除", fontWeight = FontWeight.Black)
+                Text(if (holding) "继续按住… ${(progress * 100).toInt()}%" else "按住 2 秒永久清除", fontWeight = FontWeight.Medium)
             }
             if (holding) {
                 Box(

@@ -5,7 +5,7 @@ data class CartLine(
     val quantity: Int,
     val unitPriceCents: Long,
 ) {
-    val totalCents: Long get() = unitPriceCents * quantity
+    val totalCents: Long get() = Math.multiplyExact(unitPriceCents, quantity.toLong())
 }
 
 data class Cart(
@@ -13,22 +13,23 @@ data class Cart(
     val lines: List<CartLine> = emptyList(),
     val note: String = "",
 ) {
-    val totalCents: Long get() = lines.sumOf(CartLine::totalCents)
-    val totalQuantity: Int get() = lines.sumOf(CartLine::quantity)
+    val totalCents: Long get() = lines.fold(0L) { total, line -> Math.addExact(total, line.totalCents) }
+    val totalQuantity: Int get() = lines.fold(0) { total, line -> Math.addExact(total, line.quantity) }
 
     fun add(product: Product, quantity: Int = 1): Cart {
+        require(type == DocumentType.INBOUND || type == DocumentType.OUTBOUND) { "请选择入货或出货" }
         require(quantity > 0) { "数量必须大于 0" }
         val existing = lines.firstOrNull { it.product.id == product.id }
         val defaultPrice = if (type == DocumentType.INBOUND) product.costPriceCents else product.salePriceCents
         return if (existing == null) {
             copy(lines = lines + CartLine(product, quantity, defaultPrice))
         } else {
-            copy(lines = lines.map { if (it.product.id == product.id) it.copy(quantity = it.quantity + quantity) else it })
+            copy(lines = lines.map { if (it.product.id == product.id) it.copy(quantity = Math.addExact(it.quantity, quantity)) else it })
         }
     }
 
     fun increment(productId: Long): Cart = copy(
-        lines = lines.map { if (it.product.id == productId) it.copy(quantity = it.quantity + 1) else it },
+        lines = lines.map { if (it.product.id == productId) it.copy(quantity = Math.addExact(it.quantity, 1)) else it },
     )
 
     fun decrement(productId: Long): Cart = copy(

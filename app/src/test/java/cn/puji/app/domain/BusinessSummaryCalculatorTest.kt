@@ -60,6 +60,21 @@ class BusinessSummaryCalculatorTest {
         assertEquals("12月", yearTrend.last().label)
     }
 
+    @Test fun returnsReversalsAndLossesUseTheOccurrencePeriod() {
+        val sale=document(DocumentType.OUTBOUND,600,200,100,3)
+        val returned=document(DocumentType.SALES_RETURN,200,200,100)
+        val purchase=document(DocumentType.INBOUND,400,400,400)
+        val purchaseReturn=document(DocumentType.PURCHASE_RETURN,400,400,300).copy(valuationDifferenceCents=-100)
+        val reversedReturn=returned.copy(type=DocumentType.REVERSAL,originalType=DocumentType.SALES_RETURN)
+        val loss=document(DocumentType.WRITE_OFF,0,0,50)
+        val summary=BusinessSummaryCalculator.calculate(listOf(sale,returned,purchase,purchaseReturn,reversedReturn,loss))
+        assertEquals(600L,summary.salesRevenueCents)
+        assertEquals(0L,summary.purchaseExpenseCents)
+        assertEquals(300L,summary.grossProfitCents)
+        assertEquals(50L,summary.writeOffCostCents)
+        assertEquals(-100L,summary.valuationDifferenceCents)
+    }
+
     private fun document(
         type: DocumentType,
         total: Long,

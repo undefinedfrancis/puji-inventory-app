@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +36,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import cn.puji.app.scanner.BarcodeAnalyzer
 import cn.puji.app.scanner.ScannerController
-import cn.puji.app.ui.theme.ScannerOrange
 import java.util.concurrent.Executors
 
 @Composable
@@ -44,18 +45,20 @@ fun CameraScanner(onBarcode: (String) -> Unit, enabled: Boolean, modifier: Modif
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
     }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
+    val currentBarcode by rememberUpdatedState(onBarcode)
+    val currentEnabled by rememberUpdatedState(enabled)
+    val controller = remember { ScannerController { if (currentEnabled) currentBarcode(it) } }
     LaunchedEffect(Unit) { if (!granted) launcher.launch(Manifest.permission.CAMERA) }
 
     Box(modifier = modifier.background(Color.Black, RoundedCornerShape(22.dp))) {
-        if (granted && enabled) CameraContent(onBarcode)
-        else Text(
-            if (!enabled) "已识别商品\n确认本次交易后继续扫描" else "相机权限未开启\n仍可在下方手动输入条码",
-            modifier = Modifier.align(Alignment.Center).padding(24.dp),
-            color = Color.White,
-        )
+        if (granted && enabled) CameraContent(controller)
+        else Column(Modifier.align(Alignment.Center).padding(16.dp)) {
+            Text(if(!enabled) "扫描已暂停" else "相机未开启", color = Color.White, style = MaterialTheme.typography.bodyMedium)
+            if(!granted && enabled) TextButton(onClick = { launcher.launch(Manifest.permission.CAMERA) }) { Text("允许相机", color = Color.White) }
+        }
         Box(
             Modifier.fillMaxSize().padding(horizontal = 44.dp, vertical = 48.dp)
-                .border(2.dp, ScannerOrange, RoundedCornerShape(18.dp)),
+                .border(1.dp, Color.White.copy(alpha = .6f), RoundedCornerShape(10.dp)),
         )
         Text(
             if (enabled) "将条码放入框内" else "扫描已暂停",
@@ -67,31 +70,35 @@ fun CameraScanner(onBarcode: (String) -> Unit, enabled: Boolean, modifier: Modif
 }
 
 @Composable
-private fun CameraContent(onBarcode: (String) -> Unit) {
+private fun CameraContent(controller: ScannerController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val currentCallback by rememberUpdatedState(onBarcode)
     val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER } }
     val executor = remember { Executors.newSingleThreadExecutor() }
-    val controller = remember { ScannerController { currentCallback(it) } }
     val analyzer = remember { BarcodeAnalyzer { controller.accept(it) } }
     var provider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
 
     DisposableEffect(lifecycleOwner) {
+        var disposed = false
+        var boundPreview: Preview? = null
+        var boundAnalysis: ImageAnalysis? = null
         val future = ProcessCameraProvider.getInstance(context)
         future.addListener({
+            if(disposed) return@addListener
             runCatching {
                 provider = future.get()
                 val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
                 val analysis = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build().also { it.setAnalyzer(executor, analyzer) }
-                provider?.unbindAll()
+                boundPreview = preview
+                boundAnalysis = analysis
                 provider?.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {
-            provider?.unbindAll()
+            disposed = true
+            listOfNotNull(boundPreview, boundAnalysis).takeIf { it.isNotEmpty() }?.let { provider?.unbind(*it.toTypedArray()) }
             analyzer.close()
             executor.shutdown()
         }

@@ -1,6 +1,8 @@
 package cn.puji.app.ui.records
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,7 +53,6 @@ fun CustomExportDialog(
         title = { Text("自定义时间导出") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("开始日和结束日均包含在导出范围内。")
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { pick(start) { start = it } }, modifier = Modifier.weight(1f)) {
                         Text("开始\n${start.format(DateTimeFormatter.ISO_LOCAL_DATE)}")
@@ -60,12 +61,13 @@ fun CustomExportDialog(
                         Text("结束\n${end.format(DateTimeFormatter.ISO_LOCAL_DATE)}")
                     }
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TypeButton("全部", type == null, Modifier.weight(1f)) { type = null }
-                    TypeButton("出货", type == DocumentType.OUTBOUND, Modifier.weight(1f)) { type = DocumentType.OUTBOUND }
-                    TypeButton("入货", type == DocumentType.INBOUND, Modifier.weight(1f)) { type = DocumentType.INBOUND }
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    item { TypeButton("全部", type == null, Modifier) { type = null } }
+                    items(DocumentType.values().toList()) { current ->
+                        TypeButton(cn.puji.app.ui.components.documentTypeLabel(current), type == current, Modifier) { type = current }
+                    }
                 }
-                if (!valid) Text("开始日期不能晚于结束日期")
+                if (!valid) Text("开始日期不能晚于结束日期", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
@@ -77,6 +79,5 @@ fun CustomExportDialog(
 
 @Composable
 private fun TypeButton(text: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    if (selected) Button(onClick = onClick, modifier = modifier) { Text(text) }
-    else OutlinedButton(onClick = onClick, modifier = modifier) { Text(text) }
+    cn.puji.app.ui.components.ChoiceButton(text, selected, modifier, onClick = onClick)
 }

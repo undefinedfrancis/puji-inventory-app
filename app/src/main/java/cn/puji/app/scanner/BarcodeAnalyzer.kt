@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class BarcodeAnalyzer(private val onBarcode: (String) -> Unit) : ImageAnalysis.Analyzer, AutoCloseable {
     private val busy = AtomicBoolean(false)
+    private val closed = AtomicBoolean(false)
     private val scanner: BarcodeScanner = BarcodeScanning.getClient(
         BarcodeScannerOptions.Builder().setBarcodeFormats(
             Barcode.FORMAT_EAN_8,
@@ -29,13 +30,13 @@ class BarcodeAnalyzer(private val onBarcode: (String) -> Unit) : ImageAnalysis.A
     @ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
-        if (mediaImage == null || !busy.compareAndSet(false, true)) {
+        if (closed.get() || mediaImage == null || !busy.compareAndSet(false, true)) {
             imageProxy.close()
             return
         }
         scanner.process(InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees))
             .addOnSuccessListener { barcodes ->
-                barcodes.firstNotNullOfOrNull { it.rawValue?.trim()?.takeIf(String::isNotEmpty) }?.let(onBarcode)
+                if (!closed.get()) onBarcode(barcodes.firstNotNullOfOrNull { it.rawValue?.trim()?.takeIf(String::isNotEmpty) }.orEmpty())
             }
             .addOnCompleteListener {
                 busy.set(false)
@@ -43,5 +44,5 @@ class BarcodeAnalyzer(private val onBarcode: (String) -> Unit) : ImageAnalysis.A
             }
     }
 
-    override fun close() = scanner.close()
+    override fun close() { closed.set(true); scanner.close() }
 }

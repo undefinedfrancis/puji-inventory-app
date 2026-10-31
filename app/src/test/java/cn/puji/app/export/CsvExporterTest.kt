@@ -42,7 +42,7 @@ class CsvExporterTest {
             ),
         )
 
-        assertTrue(csv.startsWith("\uFEFF单号,类型,时间,商品,条码,单价,数量,小计,成本金额,毛利润,单据总额,备注\r\n"))
+        assertTrue(csv.startsWith("\uFEFF单号,类型,时间,商品,条码,单价,数量,小计,成本金额,毛利润,单据总额,备注,原单号,原单类型,库存变动,库存成本变动,估值差额,成本来源\r\n"))
         assertTrue(csv.contains("12,出货,1970-01-01 08:00,可乐,6901,3.50,2,7.00,4.40,2.60,7.00,\"团购,已付\""))
         assertEquals(3, csv.split("\r\n").size)
     }

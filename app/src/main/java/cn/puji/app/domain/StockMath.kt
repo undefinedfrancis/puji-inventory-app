@@ -10,6 +10,7 @@ object StockMath {
                 if (quantity > current) throw InsufficientStockException("")
                 current - quantity
             }
+            else -> throw IllegalArgumentException("请使用对应的库存操作")
         }
     }
 }

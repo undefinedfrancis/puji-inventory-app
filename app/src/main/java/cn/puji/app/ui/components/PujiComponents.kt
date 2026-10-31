@@ -1,113 +1,103 @@
 package cn.puji.app.ui.components
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import cn.puji.app.ui.theme.Hairline
-import cn.puji.app.ui.theme.InkMuted
-import cn.puji.app.ui.theme.ScannerOrange
-import cn.puji.app.ui.theme.TicketGreen
-import cn.puji.app.ui.theme.TicketGreenSoft
-import cn.puji.app.ui.theme.WarningSoft
 
 @Composable
 fun PageHeader(kicker: String, title: String, action: (@Composable () -> Unit)? = null) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        Column {
-            Text(kicker.uppercase(), color = TicketGreen, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.4.sp)
-            Text(title, style = MaterialTheme.typography.headlineMedium)
-        }
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(title, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
         action?.invoke()
     }
 }
 
 @Composable
-fun ReceiptCard(
-    modifier: Modifier = Modifier,
-    accent: Color = TicketGreen,
-    content: @Composable () -> Unit,
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, Hairline),
-        shadowElevation = 1.dp,
-    ) {
-        Column {
-            Box(Modifier.fillMaxWidth().background(accent).padding(vertical = 3.dp))
-            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
-        }
+fun ReceiptCard(modifier: Modifier = Modifier, accent: Color = MaterialTheme.colorScheme.primary,
+                content: @Composable () -> Unit) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
     }
 }
 
 @Composable
 fun Metric(label: String, value: String, modifier: Modifier = Modifier, highlight: Boolean = false) {
-    Surface(
-        modifier = modifier,
-        color = if (highlight) WarningSoft else MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(18.dp),
-        border = BorderStroke(1.dp, if (highlight) ScannerOrange.copy(alpha = .3f) else Hairline),
-    ) {
-        Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(label, color = InkMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Text(
-                value,
-                fontSize = when {
-                    value.length > 13 -> 15.sp
-                    value.length > 10 -> 18.sp
-                    else -> 22.sp
-                },
-                maxLines = 1,
-                fontWeight = FontWeight.Black,
-                fontFamily = FontFamily.Monospace,
-            )
-        }
+    Column(modifier.padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.headlineSmall,
+            color = if (highlight) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
     }
 }
 
 @Composable
 fun StatusPill(text: String, warning: Boolean = false) {
-    Surface(color = if (warning) WarningSoft else TicketGreenSoft, shape = RoundedCornerShape(999.dp)) {
-        Text(
-            text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            color = if (warning) ScannerOrange else TicketGreen,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Black,
-        )
+    Surface(color = if (warning) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(8.dp)) {
+        Text(text, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium,
+            color = if (warning) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer)
     }
 }
 
 @Composable
 fun EmptyState(symbol: String, title: String, description: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp, horizontal = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(symbol, fontSize = 38.sp)
-        Text(title, style = MaterialTheme.typography.titleLarge)
-        Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Column(Modifier.fillMaxWidth().padding(vertical = 36.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        PujiIcon(PujiSymbol.Box, modifier = Modifier.size(32.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+        if (description.isNotBlank()) Text(description, style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
     }
+}
+
+@Composable
+fun PujiDivider() { HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant) }
+
+@Composable
+fun ChoiceButton(text: String, selected: Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    TextButton(onClick = onClick, modifier = modifier.heightIn(min = 48.dp), enabled = enabled,
+        shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.textButtonColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+            contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant)) {
+        Text(text)
+    }
+}
+
+@Composable
+fun AmountPair(firstLabel: String, firstValue: String, secondLabel: String, secondValue: String, prominent: Boolean = false) {
+    val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val stacked = maxWidth < 300.dp || fontScale > 1.15f || firstValue.length > 11 || secondValue.length > 11
+        val content: @Composable (String, String, Boolean) -> Unit = { label, value, first ->
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(value, style = if (prominent && first) MaterialTheme.typography.displaySmall else MaterialTheme.typography.headlineSmall)
+            }
+        }
+        if (stacked) Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            content(firstLabel, firstValue, true); content(secondLabel, secondValue, false)
+        } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            Box(Modifier.weight(1f)) { content(firstLabel, firstValue, true) }
+            Box(Modifier.weight(1f)) { content(secondLabel, secondValue, false) }
+        }
+    }
+}
+
+fun documentTypeLabel(type: cn.puji.app.domain.DocumentType): String = when (type.name) {
+    "INBOUND" -> "入货"
+    "OUTBOUND" -> "出货"
+    "OPENING" -> "期初库存"
+    "SALES_RETURN" -> "销售退货"
+    "PURCHASE_RETURN" -> "进货退货"
+    "STOCK_GAIN" -> "盘盈"
+    "STOCK_LOSS" -> "盘亏"
+    "WRITE_OFF" -> "报损"
+    "REVERSAL" -> "冲正"
+    else -> "库存变动"
 }

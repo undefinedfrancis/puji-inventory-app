@@ -1,18 +1,22 @@
 package cn.puji.app.scanner
 
 class ScannerController(
-    private val cooldownMillis: Long = 1_200,
+    private val cooldownMillis: Long = 350,
     private val onAccepted: (String) -> Unit,
 ) {
     private var lastBarcode = ""
-    private var lastAcceptedAt = Long.MIN_VALUE
+    private var clearSince: Long? = null
 
     fun accept(raw: String, nowMillis: Long = System.currentTimeMillis()): Boolean {
         val barcode = raw.trim()
-        if (barcode.isEmpty()) return false
-        if (barcode == lastBarcode && nowMillis - lastAcceptedAt < cooldownMillis) return false
+        if (barcode.isEmpty()) {
+            if (clearSince == null) clearSince = nowMillis
+            return false
+        }
+        val hasLeftFrame = clearSince?.let { nowMillis - it >= cooldownMillis } ?: false
+        clearSince = null
+        if (barcode == lastBarcode && !hasLeftFrame) return false
         lastBarcode = barcode
-        lastAcceptedAt = nowMillis
         onAccepted(barcode)
         return true
     }

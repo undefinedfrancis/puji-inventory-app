@@ -21,6 +21,7 @@ class AppResetRepositoryTest {
         context.deleteDatabase("puji.db")
         database = PujiDatabase(context)
         products = ProductRepository(database)
+        products.save(cn.puji.app.domain.Product(name="测试商品",stockQuantity=3,costPriceCents=100,salePriceCents=200)).getOrThrow()
     }
 
     @After fun tearDown() {

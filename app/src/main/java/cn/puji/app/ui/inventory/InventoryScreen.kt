@@ -1,137 +1,65 @@
 package cn.puji.app.ui.inventory
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cn.puji.app.domain.Money
 import cn.puji.app.domain.Product
 import cn.puji.app.domain.ProductCategories
 import cn.puji.app.domain.ProductCategoryCount
-import cn.puji.app.ui.components.EmptyState
-import cn.puji.app.ui.components.PageHeader
-import cn.puji.app.ui.components.ReceiptCard
-import cn.puji.app.ui.components.StatusPill
+import cn.puji.app.ui.components.*
 
 @Composable
 fun InventoryScreen(
-    products: List<Product>,
-    query: String,
-    categories: List<ProductCategoryCount>,
-    selectedCategory: String,
-    onQueryChange: (String) -> Unit,
-    onCategoryChange: (String) -> Unit,
-    onAdd: () -> Unit,
-    onEdit: (Product) -> Unit,
-    onExport: () -> Unit,
+    products: List<Product>, query: String, categories: List<ProductCategoryCount>, selectedCategory: String,
+    onQueryChange: (String) -> Unit, onCategoryChange: (String) -> Unit, onAdd: () -> Unit,
+    onEdit: (Product) -> Unit, onExport: () -> Unit, onManage: ((Product) -> Unit)? = null,
+    initialStockFilter: String = "全部",
 ) {
-    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
-        Spacer(Modifier.height(20.dp))
-        PageHeader(
-            kicker = "Inventory / 库存",
-            title = "货架总览",
-            action = { OutlinedButton(onClick = onExport) { Text("导出") } },
-        )
-        Spacer(Modifier.height(14.dp))
-        OutlinedTextField(
-            value = query,
-            onValueChange = onQueryChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            label = { Text("搜索名称、条码或分类") },
-            leadingIcon = { Text("⌕", fontSize = 24.sp) },
-        )
-        Spacer(Modifier.height(12.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(categories, key = { it.name }) { category ->
-                FilterButton(
-                    text = "${category.name} ${category.count}",
-                    selected = selectedCategory == category.name,
-                    onClick = { onCategoryChange(category.name) },
-                )
-            }
-        }
-        Spacer(Modifier.height(12.dp))
-        Button(onClick = onAdd, modifier = Modifier.fillMaxWidth()) { Text("＋ 新增商品") }
-        Spacer(Modifier.height(14.dp))
-        if (products.isEmpty()) {
-            EmptyState("□", "没有找到商品", "换个关键词，或者新增第一件商品")
-        } else {
-            val groups = if (selectedCategory == "全部") ProductCategories.group(products)
-            else listOf(cn.puji.app.domain.ProductCategoryGroup(selectedCategory, products))
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                groups.forEach { group ->
-                    item(key = "group-${group.name}") {
-                        Row(
-                            Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(group.name, fontWeight = FontWeight.Black, fontSize = 16.sp)
-                            Text("${group.products.size} 件", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        }
+    var stockFilter by remember(initialStockFilter) { mutableStateOf(initialStockFilter) }
+    val visible = products.filter { when(stockFilter) { "低库存" -> it.isLowStock; "停用" -> !it.active; else -> it.active } }
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { PageHeader("", "商品") {
+            TextButton(onClick = onExport) { Text("导出") }
+            IconButton(onClick = onAdd) { PujiIcon(PujiSymbol.Plus, description = "新增商品") }
+        } }
+        item { OutlinedTextField(value = query, onValueChange = onQueryChange, modifier = Modifier.fillMaxWidth(), singleLine = true,
+            shape = MaterialTheme.shapes.medium, label = { Text("搜索商品") },
+            leadingIcon = { PujiIcon(PujiSymbol.Search, tint = MaterialTheme.colorScheme.onSurfaceVariant) }) }
+        item { LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            items(categories, key = { it.name }) { category -> ChoiceButton(category.name,
+                selectedCategory == category.name, onClick = { onCategoryChange(category.name) }) }
+        } }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            listOf("全部", "低库存", "停用").forEach { name -> ChoiceButton(name, stockFilter == name, onClick = { stockFilter = name }) }
+        } }
+        if (visible.isEmpty()) item { EmptyState("", "暂无商品", if (query.isBlank()) "添加商品开始记账" else "试试其他名称或条码") }
+        items(visible, key = { it.id }) { product ->
+            Column {
+                Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable { (onManage ?: onEdit)(product) }.padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(product.name)
+                        Text(ProductCategories.normalize(product.category), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    items(group.products, key = { it.id }) { product -> ProductCard(product, onEdit) }
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(Money.format(product.salePriceCents), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.End)
+                        Text(if (product.active) "库存 ${product.stockQuantity}" else "已停用 · ${product.stockQuantity}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (product.isLowStock) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    PujiIcon(PujiSymbol.ChevronRight, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                item { Spacer(Modifier.height(100.dp)) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FilterButton(text: String, selected: Boolean, onClick: () -> Unit) {
-    if (selected) Button(onClick = onClick) { Text(text) }
-    else OutlinedButton(onClick = onClick) { Text(text) }
-}
-
-@Composable
-private fun ProductCard(product: Product, onEdit: (Product) -> Unit) {
-    ReceiptCard(
-        modifier = Modifier.fillMaxWidth().clickable { onEdit(product) },
-        accent = if (product.isLowStock) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
-    ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Column(Modifier.weight(1f)) {
-                Text(product.name, fontWeight = FontWeight.Black, fontSize = 17.sp)
-                Text(
-                    listOf(ProductCategories.normalize(product.category), product.barcode.ifBlank { "无条码" }).joinToString(" · "),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp,
-                )
-            }
-            StatusPill(if (product.isLowStock) "需补货" else "库存正常", product.isLowStock)
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Column {
-                Text("售价", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
-                Text(Money.format(product.salePriceCents), fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-            }
-            Column {
-                Text("进价", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
-                Text(Money.format(product.costPriceCents), fontFamily = FontFamily.Monospace)
-            }
-            Column {
-                Text("现有库存", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
-                Text("${product.stockQuantity}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black)
+                PujiDivider()
             }
         }
     }
