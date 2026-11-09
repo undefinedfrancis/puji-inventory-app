@@ -1,6 +1,18 @@
-# 铺记
+<p align="center">
+  <img src="docs/design/2026-10-31-cream/icon-distribution-512.png" width="96" alt="铺记 App 图标" />
+</p>
 
-为小卖部设计的离线 Android 进销存工具。无需注册或服务器，商品、库存和交易都保存在本机。
+<h1 align="center">铺记</h1>
+
+<p align="center">为小卖部设计的离线 Android 进销存工具。无需注册或服务器，商品、库存和交易都保存在本机。</p>
+
+<p align="center">
+  <img src="docs/screenshots/2.0/home-light.png" width="232" alt="今日：销售额、毛利、待补货与库存总值" />
+  <img src="docs/screenshots/2.0/inventory-light.png" width="232" alt="商品：分类筛选、搜索与库存余量" />
+  <img src="docs/screenshots/2.0/records-light.png" width="232" alt="经营：月度销售、进货趋势与毛利率" />
+</p>
+
+<p align="center"><sub>今日 · 商品 · 经营</sub></p>
 
 ## 2.0 升级
 
