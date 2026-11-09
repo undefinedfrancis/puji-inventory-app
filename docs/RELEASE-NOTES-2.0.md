@@ -4,7 +4,7 @@
 
 ## 下载安装
 
-- 安装包：`铺记-v2.0.1.apk`（32.7 MB）
+- 安装包：`puji-v2.0.1.apk`（32.7 MB）
 - 系统要求：Android 8.0（API 26）及以上，包名 `cn.puji.app`
 - SHA-256：`a10b097c7607aa98d94cfa9ccdf60dcc2cf22eb7ebd32738309a2a373132fa04`
 - 直接覆盖安装即可，旧版商品、库存与单据全部保留；不要卸载旧版
@@ -62,7 +62,7 @@
 | Android 数据库实测 | 33 项通过（迁移、成本、原子回滚、退货、盘点、备份、导入） |
 | Lint | 0 错误（2.0.1 为 16 条提示） |
 | 真机/模拟器验收 | 1.1.1 覆盖升级、退货冲正、草稿恢复、备份恢复、CSV 导入、375dp + 1.3 倍字号浅深色 |
-| 发布包 | `dist/铺记-v2.0.1.apk`，SHA-256 `a10b097c…2fa04` |
+| 发布包 | Release 附件 `puji-v2.0.1.apk`，SHA-256 `a10b097c…2fa04` |
 
 细节见 `docs/TESTING-V2.md`、`docs/TESTING-V2.0.1.md` 与 `docs/verification/`。
 
